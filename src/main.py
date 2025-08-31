@@ -1,12 +1,12 @@
 import json
 from loguru import logger
-from typing import List, Literal
+from typing import List, Literal, Any
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, status
+from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel, Field
 
 from langgraph.types import StreamMode
@@ -20,6 +20,7 @@ from langchain_core.messages import (
 )
 
 from src.tools import TOOLS
+from src.config.mocks.response import MockResponse
 from src.utils.stream import convert_messages
 from src.utils.logger import logger
 
@@ -30,7 +31,6 @@ class LLMRequest(BaseModel):
 		"You are an elite AI assistant. "
 		"You are helpful and friendly."
 	)
-	stream_mode: StreamMode | list[StreamMode] | None = None
 
 	class ChatMessage(BaseModel):
 		role: Literal["user", "assistant", "system", "tool"] = Field(examples=["user"])
@@ -56,6 +56,9 @@ class LLMRequest(BaseModel):
 				raise ValueError(f"Unsupported role: {role}")
 		return converted
 
+class LLMStreamRequest(LLMRequest):
+	stream_mode: StreamMode | list[StreamMode] = "values"
+
 # Initialize FastAPI app
 app = FastAPI(docs_url="/")
 
@@ -64,15 +67,17 @@ def health_check():
 	# Health check endpoint
 	return "pong"
 
-@app.post("/llm/invoke")
-async def llm_invoke(params: LLMRequest):
-	# Synchronous LLM call
+@app.post("/llm/invoke", tags=["LLM"],
+    responses={status.HTTP_200_OK: MockResponse.INVOKE_RESPONSE})
+async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
+	# Asynchronous LLM call
 	agent = create_react_agent(model=params.model, tools=TOOLS, prompt=params.system)
-	response = agent.invoke({"messages": params.to_langchain_messages()})
-	return {"message": response}
+	response = await agent.ainvoke({"messages": params.to_langchain_messages()})
+	return response
 
-@app.post("/llm/stream")
-async def llm_stream(params: LLMRequest):
+@app.post("/llm/stream", tags=["LLM"], response_class=Response,
+    responses={status.HTTP_200_OK: MockResponse.STREAM_RESPONSE})
+async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
 	# Streaming LLM call
 	agent = create_react_agent(model=params.model, tools=TOOLS, prompt=params.system)
 

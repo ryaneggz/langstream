@@ -76,6 +76,14 @@ def handle_updates_mode(payload: dict):
         converted.append(message.model_dump())
     return converted
 
+def handle_values_mode(payload: dict):
+    converted: List[dict] = []
+    messages = payload.get("messages", [])
+    for message in messages:
+        converted.append(message.model_dump())
+    payload["messages"] = converted
+    return payload
+
 ###########################################################################
 ## Message Conversion
 ###########################################################################
@@ -93,5 +101,8 @@ def convert_messages(
 
     if stream_mode == "updates":
         return handle_updates_mode(payload)
+    
+    if stream_mode == "values":
+        return handle_values_mode(payload)
 
     raise ValueError(f"Invalid stream mode: {stream_mode}")
