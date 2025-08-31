@@ -1,6 +1,9 @@
 from langgraph.types import StreamMode
 from typing import List
 
+###########################################################################
+## Handlers
+###########################################################################
 def handle_tasks_mode(payload: dict):
     converted: List[dict] = []
     
@@ -20,22 +23,26 @@ def handle_tasks_mode(payload: dict):
     
     return payload
 
-def convert_messages(
-    payload: dict, stream_mode: StreamMode | list[StreamMode] | None = None
-):
-    if stream_mode == "tasks":
-        return handle_tasks_mode(payload)
-    
-    # stream_mode: messages
+
+def handle_messages_mode(payload: dict):
     if isinstance(payload, tuple):
         return [payload[0].model_dump(), payload[1]]
-
+    
     converted: List[dict] = []
+    
+    if 'messages' in payload:
+        for message in payload['messages']:
+            converted.append(message.model_dump())
+        payload['messages'] = converted
+    
+    return payload
 
-    # stream_mode: debug
-    if payload.get("payload"):
-        if payload.get("payload", {}).get("input"):
-            input = payload.get("payload", {}).get("input")
+def handle_debug_mode(payload: dict):
+    converted: List[dict] = []
+    
+    if 'payload' in payload:
+        if 'input' in payload['payload']:
+            input = payload['payload']['input']
 
             if "messages" in input:
                 for message in input.get("messages"):
@@ -55,21 +62,36 @@ def convert_messages(
                 converted,
             ]
             return payload
+        
+def handle_updates_mode(payload: dict):
+    converted: List[dict] = []
 
-    if payload.get("messages"):
-        messages = payload.get("messages")
-
-    # stream_mode: updates
     if payload.get("agent"):
         messages = payload.get("agent", {}).get("messages", [])
 
-    # stream_mode: updates
     if payload.get("tools"):
         messages = payload.get("tools", {}).get("messages", [])
-
-    if not messages:
-        raise ValueError("No messages found in payload")
-
+    
     for message in messages:
         converted.append(message.model_dump())
     return converted
+
+###########################################################################
+## Message Conversion
+###########################################################################
+def convert_messages(
+    payload: dict, stream_mode: StreamMode | list[StreamMode] | None = None
+):
+    if stream_mode == "tasks":
+        return handle_tasks_mode(payload)
+
+    if stream_mode == "debug":
+        return handle_debug_mode(payload)
+    
+    if stream_mode == "messages":
+        return handle_messages_mode(payload)
+
+    if stream_mode == "updates":
+        return handle_updates_mode(payload)
+
+    raise ValueError(f"Invalid stream mode: {stream_mode}")
