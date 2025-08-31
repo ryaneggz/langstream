@@ -1,0 +1,16 @@
+[project]
+name = "fastapi-langgraph"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "langchain>=0.3.27",
+    "langchain-anthropic>=0.3.19",
+    "langchain-google-genai>=2.1.10",
+    "langchain-openai>=0.3.32",
+    "langgraph>=0.6.6",
+    "python-dotenv>=1.1.1",
+    "uvicorn>=0.35.0",
+]
