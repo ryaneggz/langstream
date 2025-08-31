@@ -11,6 +11,17 @@ dependencies = [
     "langchain-google-genai>=2.1.10",
     "langchain-openai>=0.3.32",
     "langgraph>=0.6.6",
+    "loguru>=0.7.3",
     "python-dotenv>=1.1.1",
     "uvicorn>=0.35.0",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+include = ["src/**/*.py"]
+exclude = ["__pycache__", "*.pyc", "*.pyo", "*.pyd", "*.pyw", "*.pyz", "*.pyj", "*.pyz.class", "*.pyz.pyc", "*.pyz.pyo", "*.pyz.pyd", "*.pyz.pyw", "*.pyz.pyj", "*.pyz.pyz.class", "*.pyz.pyz.pyc", "*.pyz.pyz.pyo", "*.pyz.pyz.pyd", "*.pyz.pyz.pyw", "*.pyz.pyz.pyj", "*.pyz.pyz.pyz.class", "*.pyz.pyz.pyz.pyc", "*.pyz.pyz.pyz.pyo", "*.pyz.pyz.pyz.pyd", "*.pyz.pyz.pyz.pyw", "*.pyz.pyz.pyz.pyj"]
+select = ["ALL"]
+
+[tool.pyright]
+include = ["src"]
