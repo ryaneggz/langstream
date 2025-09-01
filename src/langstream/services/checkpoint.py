@@ -1,37 +1,53 @@
-from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.base import Checkpoint, copy_checkpoint
 
 in_memory_checkpointer = InMemorySaver()
 
 
-async def list_checkpoints(
-    thread_id: str, checkpointer: BaseCheckpointSaver = in_memory_checkpointer
-):
-    config = RunnableConfig(configurable={"thread_id": thread_id})
-    graph = create_react_agent("", [], checkpointer=checkpointer)
-    checkpoints = []
-    async for checkpoint in graph.aget_state_history(config):
-        checkpoints.append(
-            {
-                **checkpoint.config,
-                "values": checkpoint.values,
-                "metadata": checkpoint.metadata,
-                "parent_config": checkpoint.parent_config,
-                "created_at": checkpoint.created_at,
-            }
+class CheckpointService:
+    def __init__(self, checkpointer: InMemorySaver = in_memory_checkpointer):
+        self.checkpointer = checkpointer
+
+    async def list_threads(self, limit: int = 1000):
+        thread_ids = list(self.checkpointer.storage.keys())
+        filtered_list = [item for item in thread_ids if item is not None]
+        final_list = []
+        for thread_id in filtered_list[:limit]:
+            checkpoint = await self.get_checkpoint(thread_id)
+            final_list.append({
+                'thread_id': thread_id,
+                'checkpoint': checkpoint
+            })
+        return final_list
+
+    async def list_checkpoints(self, thread_id: str):
+        config = RunnableConfig(configurable={"thread_id": thread_id})
+        graph = create_react_agent("", [], checkpointer=self.checkpointer)
+        checkpoints = []
+        async for checkpoint in graph.aget_state_history(config):
+            checkpoints.append(
+                {
+                    **checkpoint.config,
+                    "values": checkpoint.values,
+                    "metadata": checkpoint.metadata,
+                    "parent_config": checkpoint.parent_config,
+                    "created_at": checkpoint.created_at,
+                }
+            )
+        return checkpoints
+
+    async def get_checkpoint(
+        self,
+        thread_id: str,
+        checkpoint_id: str | None = None,
+    ) -> Checkpoint | None:
+        config = RunnableConfig(
+            configurable={"thread_id": thread_id, "checkpoint_id": checkpoint_id}
         )
-    return checkpoints
+        checkpoint = await self.checkpointer.aget(config)
+        return checkpoint
 
 
-async def fetch_checkpoint(
-    thread_id: str,
-    checkpoint_id: str | None = None,
-    checkpointer: BaseCheckpointSaver = in_memory_checkpointer,
-):
-    config = RunnableConfig(
-        configurable={"thread_id": thread_id, "checkpoint_id": checkpoint_id}
-    )
-    checkpoint = await checkpointer.aget(config)
-    return checkpoint
+checkpoint_service = CheckpointService()
