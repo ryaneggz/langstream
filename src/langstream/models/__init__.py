@@ -1,6 +1,8 @@
 from nanoid import generate
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
+from uuid import uuid4
+from nanoid import generate
 
 from langgraph.types import StreamMode
 from langchain_core.messages import (
@@ -12,6 +14,15 @@ from langchain_core.messages import (
 )
 
 
+class Config(BaseModel):
+    thread_id: Optional[str] = Field(
+        ..., description="The thread id", examples=[f"thread_{generate()}"]
+    )
+    checkpoint_id: Optional[str] = Field(
+        default=None, description="The checkpoint id", examples=[str(uuid4())]
+    )
+
+
 class ThreadSearch(BaseModel):
     limit: int = Field(default=100, description="The limit of threads to search")
     offset: int = Field(default=0, description="The offset of threads to search")
@@ -20,15 +31,10 @@ class ThreadSearch(BaseModel):
     )
 
 
-class Config(BaseModel):
-    thread_id: Optional[str] = Field(..., description="The thread id")
-    checkpoint_id: Optional[str] = Field(..., description="The checkpoint id")
-
-
 class LLMRequest(BaseModel):
     model: str = "openai:gpt-5-nano"
     system: str = "You are a helpful assistant."
-    config: Optional[Config] = Field(
+    metadata: Optional[Config] = Field(
         default=None, description="LangGraph configuration"
     )
 

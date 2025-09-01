@@ -1,12 +1,13 @@
 import json
 from typing import Any
 
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Body
 from fastapi.responses import StreamingResponse, Response
 
 from langgraph.prebuilt import create_react_agent
 from langchain_core.runnables.config import RunnableConfig
 
+from ..config.examples import Examples
 from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
 from ..utils.stream import convert_messages
@@ -22,11 +23,13 @@ llm_router = APIRouter(prefix="/llm", tags=["LLM"])
     responses={status.HTTP_200_OK: MockResponse.INVOKE_RESPONSE},
     name="Invoke Graph",
 )
-async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
+async def llm_invoke(
+    params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES)
+) -> dict[str, Any] | Any:
     # Add config if it exists
     config = (
-        RunnableConfig(configurable=params.config.model_dump())
-        if params.config
+        RunnableConfig(configurable=params.metadata.model_dump())
+        if params.metadata
         else None
     )
 
@@ -52,11 +55,13 @@ async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
     responses={status.HTTP_200_OK: MockResponse.STREAM_RESPONSE},
     name="Stream Graph",
 )
-async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
+async def llm_stream(
+    params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES)
+) -> StreamingResponse:
     # Add config if it exists
     config = (
-        RunnableConfig(configurable=params.config.model_dump())
-        if params.config
+        RunnableConfig(configurable=params.metadata.model_dump())
+        if params.metadata
         else None
     )
     # Streaming LLM call
