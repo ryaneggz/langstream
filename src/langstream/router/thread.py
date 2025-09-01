@@ -1,14 +1,17 @@
 from fastapi import APIRouter
-import uuid
 
+from ..services.checkpoint import fetch_checkpoint, list_checkpoints
 
 thread_router = APIRouter(prefix="/thread", tags=["Thread"])
 
 
-def gen_thread_id():
-    return str(uuid.uuid4())
+@thread_router.get("/{thread_id}/checkpoints", name="List Checkpoints for Thread")
+async def get_thread(thread_id: str):
+    return await list_checkpoints(thread_id)
 
 
-@thread_router.get("/{thread_id}")
-async def list_threads():
-    return {"message": "Thread"}
+@thread_router.get(
+    "/{thread_id}/checkpoint/{checkpoint_id}", name="Get Checkpoint for Thread"
+)
+async def get_checkpoint(thread_id: str, checkpoint_id: str):
+    return await fetch_checkpoint(thread_id, checkpoint_id)

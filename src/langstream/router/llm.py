@@ -5,6 +5,7 @@ from fastapi import status, APIRouter
 from fastapi.responses import StreamingResponse, Response
 
 from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables.config import RunnableConfig
 
 from ..tools import TOOLS
@@ -12,17 +13,35 @@ from ..config.mocks.response import MockResponse
 from ..utils.stream import convert_messages
 from ..utils.logger import logger
 from ..models import LLMRequest, LLMStreamRequest
+from ..services.checkpoint import in_memory_checkpointer
 
 llm_router = APIRouter(prefix="/llm", tags=["LLM"])
 
 
 @llm_router.post(
-    "/invoke", responses={status.HTTP_200_OK: MockResponse.INVOKE_RESPONSE}
+    "/invoke",
+    responses={status.HTTP_200_OK: MockResponse.INVOKE_RESPONSE},
+    name="Invoke Graph",
 )
 async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
     # Asynchronous LLM call
-    agent = create_react_agent(model=params.model, tools=TOOLS, prompt=params.system)
-    response = await agent.ainvoke({"messages": params.to_langchain_messages()})
+    agent = create_react_agent(
+        model=params.model,
+        tools=TOOLS,
+        prompt=params.system,
+        checkpointer=in_memory_checkpointer,
+    )
+    config = RunnableConfig(
+        configurable={
+            "thread_id": params.thread_id,
+            "checkpoint_id": params.checkpoint_id,
+        }
+    )
+    response = await agent.ainvoke(
+        {"messages": params.to_langchain_messages()},
+        config=config,
+    )
+    response["thread_id"] = params.thread_id
     return response
 
 
@@ -30,10 +49,16 @@ async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
     "/stream",
     response_class=Response,
     responses={status.HTTP_200_OK: MockResponse.STREAM_RESPONSE},
+    name="Stream Graph",
 )
 async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
     # Streaming LLM call
-    agent = create_react_agent(model=params.model, tools=TOOLS, prompt=params.system)
+    agent = create_react_agent(
+        model=params.model,
+        tools=TOOLS,
+        prompt=params.system,
+        checkpointer=in_memory_checkpointer,
+    )
 
     async def event_generator():
         try:

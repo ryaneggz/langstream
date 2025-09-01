@@ -1,3 +1,4 @@
+from nanoid import generate
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 
@@ -14,7 +15,8 @@ from langchain_core.messages import (
 class LLMRequest(BaseModel):
     model: str = "openai:gpt-5-nano"
     system: str = "You are an elite AI assistant. You are helpful and friendly."
-    thread_id: Optional[str] = Field(examples=["thread_NDzkGoTCdRcaRyt7GOepg"])
+    thread_id: Optional[str] = Field(default_factory=lambda: f"thread_{generate()}")
+    checkpoint_id: Optional[str] = Field(default=None)
 
     class ChatMessage(BaseModel):
         role: Literal["user", "assistant", "system", "tool"] = Field(examples=["user"])

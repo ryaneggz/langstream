@@ -162,6 +162,7 @@ GOOGLE_API_KEY=your_google_api_key
 - [ ] Persistent conversation history
 - [ ] Docker containerization
 - [ ] Integration tests and CI/CD pipeline
+- [ ] [LangGraph Memory Store](https://langchain-ai.github.io/langgraph/concepts/memory/#memory-storage)
 
 ## Tech Stack
 
