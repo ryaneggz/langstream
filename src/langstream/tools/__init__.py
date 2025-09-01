@@ -1,4 +1,5 @@
 from langgraph.config import get_stream_writer
+from langchain_sandbox import PyodideSandboxTool
 
 
 def get_weather(city: str) -> str:
@@ -17,5 +18,10 @@ def get_weather(city: str) -> str:
     ]
     return random.choice(templates)
 
+python_code_sandbox = PyodideSandboxTool(
+    # Allow Pyodide to install python packages that
+    # might be required.
+    allow_net=True
+)
 
-TOOLS = [get_weather]
+TOOLS = [get_weather, python_code_sandbox]

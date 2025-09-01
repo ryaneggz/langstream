@@ -14,3 +14,19 @@ wheels/
 **/.cursor/
 **/.cursorrules/
 **/.cursorignore*
+
+# Misc
+*.log
+**/node_modules/
+**/dist/
+**/build/
+**/wheels/
+**/*.egg-info/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.pyw
+**/*.pyj
+**/*.pyz
+**/*.pyz.class
