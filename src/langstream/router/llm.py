@@ -1,13 +1,13 @@
 import json
 from typing import Any
 
-from fastapi import status, APIRouter
+from fastapi import status, APIRouter, Body
 from fastapi.responses import StreamingResponse, Response
 
 from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables.config import RunnableConfig
 
+from ..config.examples import Examples
 from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
 from ..utils.stream import convert_messages
@@ -23,25 +23,29 @@ llm_router = APIRouter(prefix="/llm", tags=["LLM"])
     responses={status.HTTP_200_OK: MockResponse.INVOKE_RESPONSE},
     name="Invoke Graph",
 )
-async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
+async def llm_invoke(
+    params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES)
+) -> dict[str, Any] | Any:
+    # Add config if it exists
+    config = (
+        RunnableConfig(configurable=params.metadata.model_dump())
+        if params.metadata
+        else None
+    )
+
     # Asynchronous LLM call
     agent = create_react_agent(
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
-        checkpointer=in_memory_checkpointer,
+        checkpointer=in_memory_checkpointer if config else None,
     )
-    config = RunnableConfig(
-        configurable={
-            "thread_id": params.thread_id,
-            "checkpoint_id": params.checkpoint_id,
-        }
-    )
+
+    # Invoke the agent
     response = await agent.ainvoke(
         {"messages": params.to_langchain_messages()},
         config=config,
     )
-    response["thread_id"] = params.thread_id
     return response
 
 
@@ -51,23 +55,33 @@ async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
     responses={status.HTTP_200_OK: MockResponse.STREAM_RESPONSE},
     name="Stream Graph",
 )
-async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
+async def llm_stream(
+    params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES)
+) -> StreamingResponse:
+    # Add config if it exists
+    config = (
+        RunnableConfig(configurable=params.metadata.model_dump())
+        if params.metadata
+        else None
+    )
     # Streaming LLM call
     agent = create_react_agent(
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
-        checkpointer=in_memory_checkpointer,
+        checkpointer=in_memory_checkpointer if config else None,
     )
 
+    # Event generator
     async def event_generator():
         try:
             # Stream LLM output chunks as server-sent events
             async for chunk in agent.astream(
                 {"messages": params.to_langchain_messages()},
-                config=RunnableConfig(configurable={"thread_id": params.thread_id}),
+                config=config,
                 stream_mode=params.stream_mode,
             ):
+                # Convert the chunk to a JSON string
                 data = json.dumps(
                     convert_messages(chunk, stream_mode=params.stream_mode)
                 )
@@ -78,6 +92,7 @@ async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
             error_msg = json.dumps({"error": str(e)})
             yield f"data: {error_msg}\n\n"
 
+    # Return the streaming response
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",

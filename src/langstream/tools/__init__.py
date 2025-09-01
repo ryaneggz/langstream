@@ -1,5 +1,5 @@
 from langgraph.config import get_stream_writer
-
+from .code import python_code_interpreter
 
 def get_weather(city: str) -> str:
     """Get weather for a given city."""
@@ -17,5 +17,4 @@ def get_weather(city: str) -> str:
     ]
     return random.choice(templates)
 
-
-TOOLS = [get_weather]
+TOOLS = [get_weather] + python_code_interpreter

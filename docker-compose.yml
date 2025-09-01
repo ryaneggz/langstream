@@ -1,0 +1,34 @@
+services:
+  # FastAPI LangStream
+  langstream:
+    container_name: langstream
+    # image: ghcr.io/ryaneggz/langstream:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      INTERPRETER_URL: ${ANTHROPIC_API_KEY:-http://interpreter:8100}
+    networks:
+      - langstream_network
+  # Enso Interpreter
+  interpreter:
+    container_name: interpreter
+    image: ghcr.io/enso-labs/interpreter:latest
+    ports:
+      - "8888:8888"
+      - "8100:8100"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-supersecret}
+      - PYTHONPATH=/home/jovyan
+    entrypoint: ["sh", "-c", "start-notebook.sh --NotebookApp.token=${JUPYTER_TOKEN} & uvicorn api:app --host 0.0.0.0 --port 8100"]
+    networks:
+      - langstream_network
+
+networks:
+  langstream_network:
+    name: langstream_network  # overrides Compose’s auto-concat
+    driver: bridge
