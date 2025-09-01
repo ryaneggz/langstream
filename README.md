@@ -39,13 +39,13 @@ cp .env.example .env
 make start
 
 # Or with uv
-uv run python -m src.main
+uv run python -m src.langstream
 
 # Or directly with Python (after uv sync)
-python -m src.main
+python -m src.langstream
 
 # Or with Uvicorn
-uvicorn src.main:app --host 0.0.0.0 --port 8000
+uvicorn src.langstream.__main__:app --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at `http://localhost:8000` with interactive docs at `http://localhost:8000/`.
@@ -133,7 +133,7 @@ The application includes sample tools:
 
 - **Weather Tool**: Get weather information for cities (demo implementation)
 
-Add custom tools in `src/tools/__init__.py`.
+Add custom tools in `src/langstream/tools/__init__.py`.
 
 ## Environment Variables
 
@@ -188,12 +188,18 @@ uvx ruff format
 
 ```
 src/
-├── main.py           # FastAPI application and endpoints
-├── tools/            # LangGraph tools and utilities
-│   └── __init__.py   # Tool definitions
-└── utils/            # Utility modules
-    ├── logger.py     # Logging configuration
-    └── stream.py     # Stream processing handlers
+└── langstream/
+    ├── __main__.py          # FastAPI application entry point
+    ├── config/
+    │   └── mocks/           # Mock data and responses
+    ├── models/              # Data models and schemas
+    ├── router/
+    │   └── llm.py          # LLM endpoints and routing
+    ├── tools/              # LangGraph tools and utilities
+    │   └── __init__.py     # Tool definitions
+    └── utils/              # Utility modules
+        ├── logger.py       # Logging configuration
+        └── stream.py       # Stream processing handlers
 ```
 
 ## Contributing
