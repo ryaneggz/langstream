@@ -16,10 +16,7 @@ class CheckpointService:
         final_list = []
         for thread_id in filtered_list[:limit]:
             checkpoint = await self.get_checkpoint(thread_id)
-            final_list.append({
-                'thread_id': thread_id,
-                'checkpoint': checkpoint
-            })
+            final_list.append({"thread_id": thread_id, "checkpoint": checkpoint})
         return final_list
 
     async def list_checkpoints(self, thread_id: str):
