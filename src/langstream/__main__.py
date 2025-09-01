@@ -5,6 +5,7 @@ load_dotenv()
 
 from fastapi import FastAPI
 from .router.llm import llm_router
+from .router.thread import thread_router
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -18,6 +19,7 @@ app = FastAPI(
 )
 
 app.include_router(llm_router)
+app.include_router(thread_router)
 
 if __name__ == "__main__":
     import uvicorn
