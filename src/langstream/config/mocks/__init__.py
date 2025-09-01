@@ -128,297 +128,253 @@ data: [{"content": "", "additional_kwargs": {}, "response_metadata": {"finish_re
 """
 
 INVOKE_MOCK = {
-  "messages": [
-    {
-      "content": "Weather in Dallas?",
-      "additional_kwargs": {},
-      "response_metadata": {},
-      "type": "human",
-      "name": None,
-      "id": "bf406e4a-d0f2-42eb-8e1f-89cb7da5f9eb",
-      "example": False
-    },
-    {
-      "content": "",
-      "additional_kwargs": {
-        "tool_calls": [
-          {
-            "id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
-            "function": {
-              "arguments": "{\"city\":\"Dallas\"}",
-              "name": "get_weather"
-            },
-            "type": "function"
-          }
-        ],
-        "refusal": None
-      },
-      "response_metadata": {
-        "token_usage": {
-          "completion_tokens": 87,
-          "prompt_tokens": 145,
-          "total_tokens": 232,
-          "completion_tokens_details": {
-            "accepted_prediction_tokens": 0,
-            "audio_tokens": 0,
-            "reasoning_tokens": 64,
-            "rejected_prediction_tokens": 0
-          },
-          "prompt_tokens_details": {
-            "audio_tokens": 0,
-            "cached_tokens": 0
-          }
-        },
-        "model_name": "gpt-5-nano-2025-08-07",
-        "system_fingerprint": None,
-        "id": "chatcmpl-CAiSezbtcxB6IUbEaO3AOifkTahAL",
-        "service_tier": "default",
-        "finish_reason": "tool_calls",
-        "logprobs": None
-      },
-      "type": "ai",
-      "name": None,
-      "id": "run--57211b72-ae1b-4dfb-9265-f90b99192cd4-0",
-      "example": False,
-      "tool_calls": [
+    "messages": [
         {
-          "name": "get_weather",
-          "args": {
-            "city": "Dallas"
-          },
-          "id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
-          "type": "tool_call"
-        }
-      ],
-      "invalid_tool_calls": [],
-      "usage_metadata": {
-        "input_tokens": 145,
-        "output_tokens": 87,
-        "total_tokens": 232,
-        "input_token_details": {
-          "audio": 0,
-          "cache_read": 0
+            "content": "Weather in Dallas?",
+            "additional_kwargs": {},
+            "response_metadata": {},
+            "type": "human",
+            "name": None,
+            "id": "bf406e4a-d0f2-42eb-8e1f-89cb7da5f9eb",
+            "example": False,
         },
-        "output_token_details": {
-          "audio": 0,
-          "reasoning": 64
-        }
-      }
-    },
-    {
-      "content": "Expect sunshine and smiles in Dallas.",
-      "additional_kwargs": {},
-      "response_metadata": {},
-      "type": "tool",
-      "name": "get_weather",
-      "id": "0676409e-8b0c-4dfe-849e-ec746845b71a",
-      "tool_call_id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
-      "artifact": None,
-      "status": "success"
-    },
-    {
-      "content": "",
-      "additional_kwargs": {
-        "tool_calls": [
-          {
-            "id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
-            "function": {
-              "arguments": "{\"city\":\"Dallas\"}",
-              "name": "get_weather"
-            },
-            "type": "function"
-          }
-        ],
-        "refusal": None
-      },
-      "response_metadata": {
-        "token_usage": {
-          "completion_tokens": 471,
-          "prompt_tokens": 180,
-          "total_tokens": 651,
-          "completion_tokens_details": {
-            "accepted_prediction_tokens": 0,
-            "audio_tokens": 0,
-            "reasoning_tokens": 448,
-            "rejected_prediction_tokens": 0
-          },
-          "prompt_tokens_details": {
-            "audio_tokens": 0,
-            "cached_tokens": 0
-          }
-        },
-        "model_name": "gpt-5-nano-2025-08-07",
-        "system_fingerprint": None,
-        "id": "chatcmpl-CAiSfo8fEbSPxaA1scfiqViFXXrzD",
-        "service_tier": "default",
-        "finish_reason": "tool_calls",
-        "logprobs": None
-      },
-      "type": "ai",
-      "name": None,
-      "id": "run--4b59d3fa-c0d5-4504-8077-6d20dec8e21c-0",
-      "example": False,
-      "tool_calls": [
         {
-          "name": "get_weather",
-          "args": {
-            "city": "Dallas"
-          },
-          "id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
-          "type": "tool_call"
-        }
-      ],
-      "invalid_tool_calls": [],
-      "usage_metadata": {
-        "input_tokens": 180,
-        "output_tokens": 471,
-        "total_tokens": 651,
-        "input_token_details": {
-          "audio": 0,
-          "cache_read": 0
-        },
-        "output_token_details": {
-          "audio": 0,
-          "reasoning": 448
-        }
-      }
-    },
-    {
-      "content": "It's always sunny in Dallas!",
-      "additional_kwargs": {},
-      "response_metadata": {},
-      "type": "tool",
-      "name": "get_weather",
-      "id": "316e6ece-790b-472d-aeb3-b53501cfcffa",
-      "tool_call_id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
-      "artifact": None,
-      "status": "success"
-    },
-    {
-      "content": "",
-      "additional_kwargs": {
-        "tool_calls": [
-          {
-            "id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
-            "function": {
-              "arguments": "{\"city\":\"Dallas\"}",
-              "name": "get_weather"
+            "content": "",
+            "additional_kwargs": {
+                "tool_calls": [
+                    {
+                        "id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
+                        "function": {
+                            "arguments": '{"city":"Dallas"}',
+                            "name": "get_weather",
+                        },
+                        "type": "function",
+                    }
+                ],
+                "refusal": None,
             },
-            "type": "function"
-          }
-        ],
-        "refusal": None
-      },
-      "response_metadata": {
-        "token_usage": {
-          "completion_tokens": 535,
-          "prompt_tokens": 214,
-          "total_tokens": 749,
-          "completion_tokens_details": {
-            "accepted_prediction_tokens": 0,
-            "audio_tokens": 0,
-            "reasoning_tokens": 512,
-            "rejected_prediction_tokens": 0
-          },
-          "prompt_tokens_details": {
-            "audio_tokens": 0,
-            "cached_tokens": 0
-          }
+            "response_metadata": {
+                "token_usage": {
+                    "completion_tokens": 87,
+                    "prompt_tokens": 145,
+                    "total_tokens": 232,
+                    "completion_tokens_details": {
+                        "accepted_prediction_tokens": 0,
+                        "audio_tokens": 0,
+                        "reasoning_tokens": 64,
+                        "rejected_prediction_tokens": 0,
+                    },
+                    "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0},
+                },
+                "model_name": "gpt-5-nano-2025-08-07",
+                "system_fingerprint": None,
+                "id": "chatcmpl-CAiSezbtcxB6IUbEaO3AOifkTahAL",
+                "service_tier": "default",
+                "finish_reason": "tool_calls",
+                "logprobs": None,
+            },
+            "type": "ai",
+            "name": None,
+            "id": "run--57211b72-ae1b-4dfb-9265-f90b99192cd4-0",
+            "example": False,
+            "tool_calls": [
+                {
+                    "name": "get_weather",
+                    "args": {"city": "Dallas"},
+                    "id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
+                    "type": "tool_call",
+                }
+            ],
+            "invalid_tool_calls": [],
+            "usage_metadata": {
+                "input_tokens": 145,
+                "output_tokens": 87,
+                "total_tokens": 232,
+                "input_token_details": {"audio": 0, "cache_read": 0},
+                "output_token_details": {"audio": 0, "reasoning": 64},
+            },
         },
-        "model_name": "gpt-5-nano-2025-08-07",
-        "system_fingerprint": None,
-        "id": "chatcmpl-CAiSjftCHQ21sHgbmKeWf3tYxCR3k",
-        "service_tier": "default",
-        "finish_reason": "tool_calls",
-        "logprobs": None
-      },
-      "type": "ai",
-      "name": None,
-      "id": "run--6da81f5d-76e7-443c-a0db-1e7e8479ead0-0",
-      "example": False,
-      "tool_calls": [
         {
-          "name": "get_weather",
-          "args": {
-            "city": "Dallas"
-          },
-          "id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
-          "type": "tool_call"
-        }
-      ],
-      "invalid_tool_calls": [],
-      "usage_metadata": {
-        "input_tokens": 214,
-        "output_tokens": 535,
-        "total_tokens": 749,
-        "input_token_details": {
-          "audio": 0,
-          "cache_read": 0
+            "content": "Expect sunshine and smiles in Dallas.",
+            "additional_kwargs": {},
+            "response_metadata": {},
+            "type": "tool",
+            "name": "get_weather",
+            "id": "0676409e-8b0c-4dfe-849e-ec746845b71a",
+            "tool_call_id": "call_Qkx26tP2WH4xu0T11sFdzwTZ",
+            "artifact": None,
+            "status": "success",
         },
-        "output_token_details": {
-          "audio": 0,
-          "reasoning": 512
-        }
-      }
-    },
-    {
-      "content": "Dallas is experiencing clear skies today.",
-      "additional_kwargs": {},
-      "response_metadata": {},
-      "type": "tool",
-      "name": "get_weather",
-      "id": "cbdc0fb3-4f63-4842-9665-4d1ecb5e0b85",
-      "tool_call_id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
-      "artifact": None,
-      "status": "success"
-    },
-    {
-      "content": "Dallas today: clear skies with plenty of sun. No rain in the forecast.\n\nWould you like the current temperature and hourly forecast? I can pull that up next.",
-      "additional_kwargs": {
-        "refusal": None
-      },
-      "response_metadata": {
-        "token_usage": {
-          "completion_tokens": 810,
-          "prompt_tokens": 249,
-          "total_tokens": 1059,
-          "completion_tokens_details": {
-            "accepted_prediction_tokens": 0,
-            "audio_tokens": 0,
-            "reasoning_tokens": 768,
-            "rejected_prediction_tokens": 0
-          },
-          "prompt_tokens_details": {
-            "audio_tokens": 0,
-            "cached_tokens": 0
-          }
+        {
+            "content": "",
+            "additional_kwargs": {
+                "tool_calls": [
+                    {
+                        "id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
+                        "function": {
+                            "arguments": '{"city":"Dallas"}',
+                            "name": "get_weather",
+                        },
+                        "type": "function",
+                    }
+                ],
+                "refusal": None,
+            },
+            "response_metadata": {
+                "token_usage": {
+                    "completion_tokens": 471,
+                    "prompt_tokens": 180,
+                    "total_tokens": 651,
+                    "completion_tokens_details": {
+                        "accepted_prediction_tokens": 0,
+                        "audio_tokens": 0,
+                        "reasoning_tokens": 448,
+                        "rejected_prediction_tokens": 0,
+                    },
+                    "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0},
+                },
+                "model_name": "gpt-5-nano-2025-08-07",
+                "system_fingerprint": None,
+                "id": "chatcmpl-CAiSfo8fEbSPxaA1scfiqViFXXrzD",
+                "service_tier": "default",
+                "finish_reason": "tool_calls",
+                "logprobs": None,
+            },
+            "type": "ai",
+            "name": None,
+            "id": "run--4b59d3fa-c0d5-4504-8077-6d20dec8e21c-0",
+            "example": False,
+            "tool_calls": [
+                {
+                    "name": "get_weather",
+                    "args": {"city": "Dallas"},
+                    "id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
+                    "type": "tool_call",
+                }
+            ],
+            "invalid_tool_calls": [],
+            "usage_metadata": {
+                "input_tokens": 180,
+                "output_tokens": 471,
+                "total_tokens": 651,
+                "input_token_details": {"audio": 0, "cache_read": 0},
+                "output_token_details": {"audio": 0, "reasoning": 448},
+            },
         },
-        "model_name": "gpt-5-nano-2025-08-07",
-        "system_fingerprint": None,
-        "id": "chatcmpl-CAiSmm46Zzx4gNJB3L5gGY9pSzBWD",
-        "service_tier": "default",
-        "finish_reason": "stop",
-        "logprobs": None
-      },
-      "type": "ai",
-      "name": None,
-      "id": "run--fb3393b4-7dd2-4706-a83b-04f39661adc6-0",
-      "example": None,
-      "tool_calls": [],
-      "invalid_tool_calls": [],
-      "usage_metadata": {
-        "input_tokens": 249,
-        "output_tokens": 810,
-        "total_tokens": 1059,
-        "input_token_details": {
-          "audio": 0,
-          "cache_read": 0
+        {
+            "content": "It's always sunny in Dallas!",
+            "additional_kwargs": {},
+            "response_metadata": {},
+            "type": "tool",
+            "name": "get_weather",
+            "id": "316e6ece-790b-472d-aeb3-b53501cfcffa",
+            "tool_call_id": "call_5q6HATJ52T4YWfkXyOgeoi1T",
+            "artifact": None,
+            "status": "success",
         },
-        "output_token_details": {
-          "audio": 0,
-          "reasoning": 768
-        }
-      }
-    }
-  ]
+        {
+            "content": "",
+            "additional_kwargs": {
+                "tool_calls": [
+                    {
+                        "id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
+                        "function": {
+                            "arguments": '{"city":"Dallas"}',
+                            "name": "get_weather",
+                        },
+                        "type": "function",
+                    }
+                ],
+                "refusal": None,
+            },
+            "response_metadata": {
+                "token_usage": {
+                    "completion_tokens": 535,
+                    "prompt_tokens": 214,
+                    "total_tokens": 749,
+                    "completion_tokens_details": {
+                        "accepted_prediction_tokens": 0,
+                        "audio_tokens": 0,
+                        "reasoning_tokens": 512,
+                        "rejected_prediction_tokens": 0,
+                    },
+                    "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0},
+                },
+                "model_name": "gpt-5-nano-2025-08-07",
+                "system_fingerprint": None,
+                "id": "chatcmpl-CAiSjftCHQ21sHgbmKeWf3tYxCR3k",
+                "service_tier": "default",
+                "finish_reason": "tool_calls",
+                "logprobs": None,
+            },
+            "type": "ai",
+            "name": None,
+            "id": "run--6da81f5d-76e7-443c-a0db-1e7e8479ead0-0",
+            "example": False,
+            "tool_calls": [
+                {
+                    "name": "get_weather",
+                    "args": {"city": "Dallas"},
+                    "id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
+                    "type": "tool_call",
+                }
+            ],
+            "invalid_tool_calls": [],
+            "usage_metadata": {
+                "input_tokens": 214,
+                "output_tokens": 535,
+                "total_tokens": 749,
+                "input_token_details": {"audio": 0, "cache_read": 0},
+                "output_token_details": {"audio": 0, "reasoning": 512},
+            },
+        },
+        {
+            "content": "Dallas is experiencing clear skies today.",
+            "additional_kwargs": {},
+            "response_metadata": {},
+            "type": "tool",
+            "name": "get_weather",
+            "id": "cbdc0fb3-4f63-4842-9665-4d1ecb5e0b85",
+            "tool_call_id": "call_gFc8q0zpvJHLAz8uJFfbMuIm",
+            "artifact": None,
+            "status": "success",
+        },
+        {
+            "content": "Dallas today: clear skies with plenty of sun. No rain in the forecast.\n\nWould you like the current temperature and hourly forecast? I can pull that up next.",
+            "additional_kwargs": {"refusal": None},
+            "response_metadata": {
+                "token_usage": {
+                    "completion_tokens": 810,
+                    "prompt_tokens": 249,
+                    "total_tokens": 1059,
+                    "completion_tokens_details": {
+                        "accepted_prediction_tokens": 0,
+                        "audio_tokens": 0,
+                        "reasoning_tokens": 768,
+                        "rejected_prediction_tokens": 0,
+                    },
+                    "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0},
+                },
+                "model_name": "gpt-5-nano-2025-08-07",
+                "system_fingerprint": None,
+                "id": "chatcmpl-CAiSmm46Zzx4gNJB3L5gGY9pSzBWD",
+                "service_tier": "default",
+                "finish_reason": "stop",
+                "logprobs": None,
+            },
+            "type": "ai",
+            "name": None,
+            "id": "run--fb3393b4-7dd2-4706-a83b-04f39661adc6-0",
+            "example": None,
+            "tool_calls": [],
+            "invalid_tool_calls": [],
+            "usage_metadata": {
+                "input_tokens": 249,
+                "output_tokens": 810,
+                "total_tokens": 1059,
+                "input_token_details": {"audio": 0, "cache_read": 0},
+                "output_token_details": {"audio": 0, "reasoning": 768},
+            },
+        },
+    ]
 }

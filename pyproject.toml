@@ -1,7 +1,7 @@
 [project]
-name = "fastapi-langgraph"
+name = "langstream"
 version = "0.1.0"
-description = "Add your description here"
+description = "LangStream is a fastAPI web service for AI-powered conversations using LangGraph agents with multiple LLM providers."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -21,7 +21,14 @@ line-length = 88
 target-version = "py312"
 include = ["src/**/*.py"]
 exclude = ["__pycache__", "*.pyc", "*.pyo", "*.pyd", "*.pyw", "*.pyz", "*.pyj", "*.pyz.class", "*.pyz.pyc", "*.pyz.pyo", "*.pyz.pyd", "*.pyz.pyw", "*.pyz.pyj", "*.pyz.pyz.class", "*.pyz.pyz.pyc", "*.pyz.pyz.pyo", "*.pyz.pyz.pyd", "*.pyz.pyz.pyw", "*.pyz.pyz.pyj", "*.pyz.pyz.pyz.class", "*.pyz.pyz.pyz.pyc", "*.pyz.pyz.pyz.pyo", "*.pyz.pyz.pyz.pyd", "*.pyz.pyz.pyz.pyw", "*.pyz.pyz.pyz.pyj"]
+
+[tool.ruff.lint]
 select = ["ALL"]
+ignore = [
+    "D203",  # Ignore blank-line-before-class-docstring (conflicts with D211)
+    "D213",  # Ignore multi-line-summary-second-line (conflicts with D212) 
+    "COM812", # Ignore trailing-comma (conflicts with formatter)
+]
 
 [tool.pyright]
-include = ["src"]
+include = ["src.langstream"]

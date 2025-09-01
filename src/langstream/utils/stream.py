@@ -1,48 +1,50 @@
 from langgraph.types import StreamMode
 from typing import List
 
+
 ###########################################################################
 ## Handlers
 ###########################################################################
 def handle_tasks_mode(payload: dict):
     converted: List[dict] = []
-    
-    if 'input' in payload:
-        input = payload['input']
-        if 'messages' in payload['input']:
-            for message in input['messages']:
+
+    if "input" in payload:
+        input = payload["input"]
+        if "messages" in payload["input"]:
+            for message in input["messages"]:
                 converted.append(message.model_dump())
-            input['messages'] = converted
+            input["messages"] = converted
         return payload
-    
-    if 'result' in payload:
-        messages = payload['result'][0][1]
+
+    if "result" in payload:
+        messages = payload["result"][0][1]
         for message in messages:
             converted.append(message.model_dump())
-        payload['result'][0] = [payload['result'][0][0], converted]
-    
+        payload["result"][0] = [payload["result"][0][0], converted]
+
     return payload
 
 
 def handle_messages_mode(payload: dict):
     if isinstance(payload, tuple):
         return [payload[0].model_dump(), payload[1]]
-    
+
     converted: List[dict] = []
-    
-    if 'messages' in payload:
-        for message in payload['messages']:
+
+    if "messages" in payload:
+        for message in payload["messages"]:
             converted.append(message.model_dump())
-        payload['messages'] = converted
-    
+        payload["messages"] = converted
+
     return payload
+
 
 def handle_debug_mode(payload: dict):
     converted: List[dict] = []
-    
-    if 'payload' in payload:
-        if 'input' in payload['payload']:
-            input = payload['payload']['input']
+
+    if "payload" in payload:
+        if "input" in payload["payload"]:
+            input = payload["payload"]["input"]
 
             if "messages" in input:
                 for message in input.get("messages"):
@@ -62,7 +64,8 @@ def handle_debug_mode(payload: dict):
                 converted,
             ]
             return payload
-        
+
+
 def handle_updates_mode(payload: dict):
     converted: List[dict] = []
 
@@ -71,10 +74,11 @@ def handle_updates_mode(payload: dict):
 
     if payload.get("tools"):
         messages = payload.get("tools", {}).get("messages", [])
-    
+
     for message in messages:
         converted.append(message.model_dump())
     return converted
+
 
 def handle_values_mode(payload: dict):
     converted: List[dict] = []
@@ -83,6 +87,7 @@ def handle_values_mode(payload: dict):
         converted.append(message.model_dump())
     payload["messages"] = converted
     return payload
+
 
 ###########################################################################
 ## Message Conversion
@@ -95,13 +100,13 @@ def convert_messages(
 
     if stream_mode == "debug":
         return handle_debug_mode(payload)
-    
+
     if stream_mode == "messages":
         return handle_messages_mode(payload)
 
     if stream_mode == "updates":
         return handle_updates_mode(payload)
-    
+
     if stream_mode == "values":
         return handle_values_mode(payload)
 

@@ -12,13 +12,13 @@ LOG_FORMAT = (
 
 logger.remove()  # Remove the default handler
 logger.add(
-	sys.stdout,
-	format=LOG_FORMAT,
-	level="DEBUG",  # Change to DEBUG for verbose output
-	colorize=True,
-	backtrace=True,  # Show error backtraces for easier debugging
-	# diagnose=True,   # Show variable values in tracebacks
-	# catch=True,      # Catch exceptions and show full traceback
+    sys.stdout,
+    format=LOG_FORMAT,
+    level="DEBUG",  # Change to DEBUG for verbose output
+    colorize=True,
+    backtrace=True,  # Show error backtraces for easier debugging
+    # diagnose=True,   # Show variable values in tracebacks
+    # catch=True,      # Catch exceptions and show full traceback
 )
 
 __all__ = ["logger"]
