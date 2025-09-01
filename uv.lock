@@ -151,35 +151,6 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-langgraph"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "fastapi" },
-    { name = "langchain" },
-    { name = "langchain-anthropic" },
-    { name = "langchain-google-genai" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "loguru" },
-    { name = "python-dotenv" },
-    { name = "uvicorn" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.116.1" },
-    { name = "langchain", specifier = ">=0.3.27" },
-    { name = "langchain-anthropic", specifier = ">=0.3.19" },
-    { name = "langchain-google-genai", specifier = ">=2.1.10" },
-    { name = "langchain-openai", specifier = ">=0.3.32" },
-    { name = "langgraph", specifier = ">=0.6.6" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "python-dotenv", specifier = ">=1.1.1" },
-    { name = "uvicorn", specifier = ">=0.35.0" },
-]
-
-[[package]]
 name = "filetype"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -605,6 +576,35 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/20/ad/2c89c128b575d89ba7c7af05de6d715703fe9648110f2ec3c90255956681/langsmith-0.4.21.tar.gz", hash = "sha256:eabfb66970d50964918acba524b407e8cfe585448013e3135ca92388c858d009", size = 938666 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7d/79/5ccad558563861f7ae6a77aeba259578c35192e9c109b0142fcf490b3c50/langsmith-0.4.21-py3-none-any.whl", hash = "sha256:15b189e2e7a3337a07cf250d91e158efcd0b39458735dc9e583c56dd0f21e4e0", size = 378494 },
+]
+
+[[package]]
+name = "langstream"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "langchain" },
+    { name = "langchain-anthropic" },
+    { name = "langchain-google-genai" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "loguru" },
+    { name = "python-dotenv" },
+    { name = "uvicorn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.116.1" },
+    { name = "langchain", specifier = ">=0.3.27" },
+    { name = "langchain-anthropic", specifier = ">=0.3.19" },
+    { name = "langchain-google-genai", specifier = ">=2.1.10" },
+    { name = "langchain-openai", specifier = ">=0.3.32" },
+    { name = "langgraph", specifier = ">=0.6.6" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "python-dotenv", specifier = ">=1.1.1" },
+    { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
 [[package]]

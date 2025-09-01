@@ -5,6 +5,7 @@ from fastapi import status, APIRouter
 from fastapi.responses import StreamingResponse, Response
 
 from langgraph.prebuilt import create_react_agent
+from langchain_core.runnables.config import RunnableConfig
 
 from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
@@ -39,6 +40,7 @@ async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
             # Stream LLM output chunks as server-sent events
             async for chunk in agent.astream(
                 {"messages": params.to_langchain_messages()},
+                config=RunnableConfig(configurable={"thread_id": params.thread_id}),
                 stream_mode=params.stream_mode,
             ):
                 data = json.dumps(
