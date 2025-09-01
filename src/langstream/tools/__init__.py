@@ -18,6 +18,7 @@ def get_weather(city: str) -> str:
     ]
     return random.choice(templates)
 
+
 python_code_sandbox = PyodideSandboxTool(
     # Allow Pyodide to install python packages that
     # might be required.

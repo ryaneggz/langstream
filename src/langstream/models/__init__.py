@@ -12,11 +12,25 @@ from langchain_core.messages import (
 )
 
 
+class ThreadSearch(BaseModel):
+    limit: int = Field(default=100, description="The limit of threads to search")
+    offset: int = Field(default=0, description="The offset of threads to search")
+    metadata: Optional[dict] = Field(
+        default=None, description="The metadata of threads to search"
+    )
+
+
+class Config(BaseModel):
+    thread_id: Optional[str] = Field(..., description="The thread id")
+    checkpoint_id: Optional[str] = Field(..., description="The checkpoint id")
+
+
 class LLMRequest(BaseModel):
     model: str = "openai:gpt-5-nano"
-    system: str = "You are an elite AI assistant. You are helpful and friendly."
-    thread_id: Optional[str] = Field(default_factory=lambda: f"thread_{generate()}")
-    checkpoint_id: Optional[str] = Field(default=None)
+    system: str = "You are a helpful assistant."
+    config: Optional[Config] = Field(
+        default=None, description="LangGraph configuration"
+    )
 
     class ChatMessage(BaseModel):
         role: Literal["user", "assistant", "system", "tool"] = Field(examples=["user"])

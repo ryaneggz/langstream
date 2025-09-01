@@ -1,13 +1,16 @@
 from fastapi import APIRouter, HTTPException
 
+from ..models import ThreadSearch
 from ..services.checkpoint import checkpoint_service
 
 thread_router = APIRouter(prefix="/threads", tags=["Thread"])
 
 
-@thread_router.get("", name="List Threads in Checkpointer")
-async def list_threads(limit: int = 1000):
-    return {"threads": await checkpoint_service.list_threads(limit=limit)}
+@thread_router.post("/search", name="List Threads in Checkpointer")
+async def search_threads(thread_search: ThreadSearch):
+    return {
+        "threads": await checkpoint_service.search_threads(thread_search=thread_search)
+    }
 
 
 @thread_router.get("/{thread_id}/checkpoints", name="List Checkpoints for Thread")

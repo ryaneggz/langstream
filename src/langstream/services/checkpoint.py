@@ -1,7 +1,9 @@
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.base import Checkpoint, copy_checkpoint
+from langgraph.checkpoint.base import Checkpoint
+
+from ..models import ThreadSearch
 
 in_memory_checkpointer = InMemorySaver()
 
@@ -10,11 +12,11 @@ class CheckpointService:
     def __init__(self, checkpointer: InMemorySaver = in_memory_checkpointer):
         self.checkpointer = checkpointer
 
-    async def list_threads(self, limit: int = 1000):
+    async def search_threads(self, thread_search: ThreadSearch):
         thread_ids = list(self.checkpointer.storage.keys())
         filtered_list = [item for item in thread_ids if item is not None]
         final_list = []
-        for thread_id in filtered_list[:limit]:
+        for thread_id in filtered_list[: thread_search.limit]:
             checkpoint = await self.get_checkpoint(thread_id)
             final_list.append({"thread_id": thread_id, "checkpoint": checkpoint})
         return final_list

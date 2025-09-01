@@ -5,7 +5,6 @@ from fastapi import status, APIRouter
 from fastapi.responses import StreamingResponse, Response
 
 from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.runnables.config import RunnableConfig
 
 from ..tools import TOOLS
@@ -24,24 +23,26 @@ llm_router = APIRouter(prefix="/llm", tags=["LLM"])
     name="Invoke Graph",
 )
 async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
+    # Add config if it exists
+    config = (
+        RunnableConfig(configurable=params.config.model_dump())
+        if params.config
+        else None
+    )
+
     # Asynchronous LLM call
     agent = create_react_agent(
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
-        checkpointer=in_memory_checkpointer,
+        checkpointer=in_memory_checkpointer if config else None,
     )
-    config = RunnableConfig(
-        configurable={
-            "thread_id": params.thread_id,
-            "checkpoint_id": params.checkpoint_id,
-        }
-    )
+
+    # Invoke the agent
     response = await agent.ainvoke(
         {"messages": params.to_langchain_messages()},
         config=config,
     )
-    response["thread_id"] = params.thread_id
     return response
 
 
@@ -52,22 +53,30 @@ async def llm_invoke(params: LLMRequest) -> dict[str, Any] | Any:
     name="Stream Graph",
 )
 async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
+    # Add config if it exists
+    config = (
+        RunnableConfig(configurable=params.config.model_dump())
+        if params.config
+        else None
+    )
     # Streaming LLM call
     agent = create_react_agent(
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
-        checkpointer=in_memory_checkpointer,
+        checkpointer=in_memory_checkpointer if config else None,
     )
 
+    # Event generator
     async def event_generator():
         try:
             # Stream LLM output chunks as server-sent events
             async for chunk in agent.astream(
                 {"messages": params.to_langchain_messages()},
-                config=RunnableConfig(configurable={"thread_id": params.thread_id}),
+                config=config,
                 stream_mode=params.stream_mode,
             ):
+                # Convert the chunk to a JSON string
                 data = json.dumps(
                     convert_messages(chunk, stream_mode=params.stream_mode)
                 )
@@ -78,6 +87,7 @@ async def llm_stream(params: LLMStreamRequest) -> StreamingResponse:
             error_msg = json.dumps({"error": str(e)})
             yield f"data: {error_msg}\n\n"
 
+    # Return the streaming response
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
