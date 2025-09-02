@@ -4,9 +4,9 @@ from typing import Any
 from fastapi import status, APIRouter, Body
 from fastapi.responses import StreamingResponse, Response
 
-from langgraph.prebuilt import create_react_agent
 from langchain_core.runnables.config import RunnableConfig
 
+from ..graphs import graph_builder
 from ..config.examples import Examples
 from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
@@ -14,9 +14,9 @@ from ..utils.stream import convert_messages
 from ..utils.logger import logger
 from ..models import LLMRequest, LLMStreamRequest
 from ..services.checkpoint import in_memory_checkpointer
+from ..services.memory import in_memory_store, memory_service
 
 llm_router = APIRouter(prefix="/llm", tags=["LLM"])
-
 
 @llm_router.post(
     "/invoke",
@@ -32,13 +32,17 @@ async def llm_invoke(
         if params.metadata
         else None
     )
+    
+    await memory_service.set("user_1234", {"name": "John Doe", "email": "john.doe@example.com"})
 
     # Asynchronous LLM call
-    agent = create_react_agent(
+    agent = graph_builder(
+        graph_name="react",
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
         checkpointer=in_memory_checkpointer if config else None,
+        store=in_memory_store if config else None,
     )
 
     # Invoke the agent
@@ -65,11 +69,13 @@ async def llm_stream(
         else None
     )
     # Streaming LLM call
-    agent = create_react_agent(
+    agent = graph_builder(
+        graph_name="react",
         model=params.model,
         tools=TOOLS,
         prompt=params.system,
         checkpointer=in_memory_checkpointer if config else None,
+        store=in_memory_store if config else None,
     )
 
     # Event generator
