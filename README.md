@@ -158,9 +158,10 @@ GOOGLE_API_KEY=your_google_api_key
 
 ### Planned Enhancements
 - [ ] Authentication and authorization
+- [ ] Streamlit Chat Interface
 - [ ] Request/response caching
-- [ ] Persistent conversation history
-- [ ] Docker containerization
+- [x] Persistent conversation history
+- [x] Docker containerization
 - [ ] Integration tests and CI/CD pipeline
 - [ ] [LangGraph Memory Store](https://langchain-ai.github.io/langgraph/concepts/memory/#memory-storage)
 
