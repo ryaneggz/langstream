@@ -19,7 +19,10 @@ class Config(BaseModel):
         ..., description="The thread id", examples=[f"thread_{generate()}"]
     )
     checkpoint_id: Optional[str] = Field(
-        default=None, description="The checkpoint id", examples=[str(uuid4())]
+        ..., description="The checkpoint id", examples=[str(uuid4())]
+    )
+    graph_id: Optional[Literal["react","deepagent"]] = Field(
+        ..., description="The graph id", examples=["react", "deepagent"]
     )
 
 

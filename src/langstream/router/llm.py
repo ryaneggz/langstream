@@ -31,18 +31,20 @@ async def construct_agent(params: LLMRequest | LLMStreamRequest):
         ## Construct the prompt
         memory_prompt = await add_memories_to_system()
         prompt = (
-            params.system + "\n" + memory_prompt if memory_prompt else params.system
+            params.system + "\n" + memory_prompt 
+            if memory_prompt 
+            else params.system
         )
         tools = TOOLS + MEMORY_TOOLS
 
     # Asynchronous LLM call
     agent = graph_builder(
-        graph_name="react",
+        graph_name=params.metadata.graph_id,
         model=params.model,
         tools=tools,
         prompt=prompt,
         checkpointer=in_memory_checkpointer if config else None,
-        store=in_memory_store if config else None,
+        # store=in_memory_store if config else None,
     )
     return agent, config
 

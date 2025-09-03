@@ -60,6 +60,18 @@ class Examples:
                 "messages": [{"role": "user", "content": "Weather in Dallas?"}],
             },
         ),
+        "deepagent": Example(
+            summary="deepagent",
+            description="Invoke DeepAgent Graph",
+            value={
+                "model": "openai:gpt-5-nano",
+                "system": "You are a helpful assistant.",
+                "metadata": {
+                    "graph_id": "deepagent",
+                },
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
+        ),
     }
 
     LLM_STREAM_EXAMPLES = {
