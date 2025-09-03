@@ -26,7 +26,7 @@ class Examples:
             },
         ),
     }
-    
+
     LLM_INVOKE_EXAMPLES = {
         "stateless_invoke": Example(
             summary="stateless_invoke",
@@ -34,13 +34,8 @@ class Examples:
             value={
                 "model": "openai:gpt-5-nano",
                 "system": "You are a helpful assistant.",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
         "persistant_thread": Example(
             summary="persistent_thread",
@@ -48,16 +43,9 @@ class Examples:
             value={
                 "model": "openai:gpt-5-nano",
                 "system": "You are a helpful assistant.",
-                "metadata": {
-                    "thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj"
-                },
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "metadata": {"thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj"},
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
         "branch_from_checkpoint": Example(
             summary="branch_from_checkpoint",
@@ -67,18 +55,13 @@ class Examples:
                 "system": "You are a helpful assistant.",
                 "metadata": {
                     "thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj",
-                    "checkpoint_id": "6fb4c17e-ff1d-46ca-af6d-ff289a019423"
+                    "checkpoint_id": "6fb4c17e-ff1d-46ca-af6d-ff289a019423",
                 },
-                "messages": [
-                    {
-                    "role": "user",
-                    "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
     }
-    
+
     LLM_STREAM_EXAMPLES = {
         "stateless_stream": Example(
             summary="stateless_stream",
@@ -87,13 +70,8 @@ class Examples:
                 "model": "openai:gpt-5-nano",
                 "system": "You are a helpful assistant.",
                 "stream_mode": "messages",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
         "persistant_thread": Example(
             summary="persistant_thread",
@@ -102,16 +80,9 @@ class Examples:
                 "model": "openai:gpt-5-nano",
                 "system": "You are a helpful assistant.",
                 "stream_mode": "messages",
-                "metadata": {
-                    "thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj"
-                },
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "metadata": {"thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj"},
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
         "branch_from_checkpoint": Example(
             summary="branch_from_checkpoint",
@@ -122,14 +93,9 @@ class Examples:
                 "stream_mode": "messages",
                 "metadata": {
                     "thread_id": "thread_CkzLFPHdZX8ID6iZSP9pj",
-                    "checkpoint_id": "6fb4c17e-ff1d-46ca-af6d-ff289a019423"
+                    "checkpoint_id": "6fb4c17e-ff1d-46ca-af6d-ff289a019423",
                 },
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Weather in Dallas?"
-                    }
-                ]
-            }
+                "messages": [{"role": "user", "content": "Weather in Dallas?"}],
+            },
         ),
     }
