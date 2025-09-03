@@ -4,9 +4,9 @@ from typing import Any
 from fastapi import status, APIRouter, Body
 from fastapi.responses import StreamingResponse, Response
 
-from langgraph.prebuilt import create_react_agent
 from langchain_core.runnables.config import RunnableConfig
 
+from ..graphs import graph_builder
 from ..config.examples import Examples
 from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
@@ -14,8 +14,36 @@ from ..utils.stream import convert_messages
 from ..utils.logger import logger
 from ..models import LLMRequest, LLMStreamRequest
 from ..services.checkpoint import in_memory_checkpointer
+from ..services.memory import in_memory_store, memory_service
+from ..graphs import add_memories_to_system
+from ..tools.memory import save_memory, search_memory
 
 llm_router = APIRouter(prefix="/llm", tags=["LLM"])
+
+async def construct_agent(params: LLMRequest|LLMStreamRequest):
+    # Add config if it exists
+    config = (
+        RunnableConfig(configurable=params.metadata.model_dump())
+        if params.metadata
+        else None
+    )
+    
+    if config:
+        ## Construct the prompt
+        memory_prompt = await add_memories_to_system()
+        prompt = params.system + "\n" + memory_prompt if memory_prompt else params.system
+        tools = TOOLS + [save_memory]
+
+    # Asynchronous LLM call
+    agent = graph_builder(
+        graph_name="react",
+        model=params.model,
+        tools=tools,
+        prompt=prompt,
+        checkpointer=in_memory_checkpointer if config else None,
+        store=in_memory_store if config else None,
+    )
+    return agent, config
 
 
 @llm_router.post(
@@ -26,20 +54,7 @@ llm_router = APIRouter(prefix="/llm", tags=["LLM"])
 async def llm_invoke(
     params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES)
 ) -> dict[str, Any] | Any:
-    # Add config if it exists
-    config = (
-        RunnableConfig(configurable=params.metadata.model_dump())
-        if params.metadata
-        else None
-    )
-
-    # Asynchronous LLM call
-    agent = create_react_agent(
-        model=params.model,
-        tools=TOOLS,
-        prompt=params.system,
-        checkpointer=in_memory_checkpointer if config else None,
-    )
+    agent, config = await construct_agent(params)
 
     # Invoke the agent
     response = await agent.ainvoke(
@@ -58,19 +73,7 @@ async def llm_invoke(
 async def llm_stream(
     params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES)
 ) -> StreamingResponse:
-    # Add config if it exists
-    config = (
-        RunnableConfig(configurable=params.metadata.model_dump())
-        if params.metadata
-        else None
-    )
-    # Streaming LLM call
-    agent = create_react_agent(
-        model=params.model,
-        tools=TOOLS,
-        prompt=params.system,
-        checkpointer=in_memory_checkpointer if config else None,
-    )
+    agent, config = await construct_agent(params)
 
     # Event generator
     async def event_generator():

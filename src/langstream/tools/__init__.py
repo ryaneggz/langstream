@@ -18,3 +18,4 @@ def get_weather(city: str) -> str:
     return random.choice(templates)
 
 TOOLS = [get_weather] + python_code_interpreter
+
