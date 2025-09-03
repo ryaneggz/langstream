@@ -6,33 +6,34 @@ from fastapi.responses import StreamingResponse, Response
 
 from langchain_core.runnables.config import RunnableConfig
 
-from ..graphs import graph_builder
 from ..config.examples import Examples
-from ..tools import TOOLS
 from ..config.mocks.response import MockResponse
-from ..utils.stream import convert_messages
-from ..utils.logger import logger
 from ..models import LLMRequest, LLMStreamRequest
+from ..tools import TOOLS, MEMORY_TOOLS
+from ..utils.logger import logger
+from ..utils.stream import convert_messages
+from ..services.memory import in_memory_store
 from ..services.checkpoint import in_memory_checkpointer
-from ..services.memory import in_memory_store, memory_service
-from ..graphs import add_memories_to_system
-from ..tools.memory import save_memory, search_memory
+from ..graphs import add_memories_to_system, graph_builder
 
 llm_router = APIRouter(prefix="/llm", tags=["LLM"])
 
-async def construct_agent(params: LLMRequest|LLMStreamRequest):
+
+async def construct_agent(params: LLMRequest | LLMStreamRequest):
     # Add config if it exists
     config = (
         RunnableConfig(configurable=params.metadata.model_dump())
         if params.metadata
         else None
     )
-    
+
     if config:
         ## Construct the prompt
         memory_prompt = await add_memories_to_system()
-        prompt = params.system + "\n" + memory_prompt if memory_prompt else params.system
-        tools = TOOLS + [save_memory]
+        prompt = (
+            params.system + "\n" + memory_prompt if memory_prompt else params.system
+        )
+        tools = TOOLS + MEMORY_TOOLS
 
     # Asynchronous LLM call
     agent = graph_builder(
@@ -52,7 +53,7 @@ async def construct_agent(params: LLMRequest|LLMStreamRequest):
     name="Invoke Graph",
 )
 async def llm_invoke(
-    params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES)
+    params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES),
 ) -> dict[str, Any] | Any:
     agent, config = await construct_agent(params)
 
@@ -71,7 +72,7 @@ async def llm_invoke(
     name="Stream Graph",
 )
 async def llm_stream(
-    params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES)
+    params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES),
 ) -> StreamingResponse:
     agent, config = await construct_agent(params)
 

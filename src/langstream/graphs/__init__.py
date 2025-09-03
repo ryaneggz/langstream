@@ -1,4 +1,3 @@
-import yaml
 from typing import Sequence, Union, Callable
 from langchain_core.tools import BaseTool
 from langgraph.prebuilt import ToolNode
@@ -8,10 +7,9 @@ from langgraph.store.base import BaseStore
 from langgraph.graph.state import CompiledStateGraph
 from ..services.memory import memory_service
 
+
 async def add_memories_to_system():
     memories = await memory_service.search()
-    if not memories:
-        return None
 
     def memory_to_xml(memory):
         items = []
@@ -19,19 +17,23 @@ async def add_memories_to_system():
             items.append(f"<{key}>{value}</{key}>")
         return f"<memory>{''.join(items)}</memory>"
 
-    formatted_memories = "\n".join(
-        memory_to_xml(memory) for memory in memories
+    formatted_memories = (
+        "\n".join(memory_to_xml(memory) for memory in memories)
+        if memories
+        else "No memories found."
     )
 
     return (
-        "You have the following memories:\n\n"
+        "You have the following general memories "
+        "(these can include things like todos, notes, "
+        "reminders, or other information you wanted to remember):\n\n"
         f"{formatted_memories}"
     )
-    
+
 
 def graph_builder(
-    graph_name: str = "react", 
-    tools: Union[Sequence[Union[BaseTool, Callable]], ToolNode] = [], 
+    graph_name: str = "react",
+    tools: Union[Sequence[Union[BaseTool, Callable]], ToolNode] = [],
     prompt: str = "You are a helpful assistant.",
     model: str = "openai:gpt-5-nano",
     checkpointer: InMemorySaver | None = None,
@@ -45,5 +47,5 @@ def graph_builder(
             checkpointer=checkpointer,
             store=store,
         )
-        
+
     raise ValueError(f"Invalid graph name: {graph_name}")
