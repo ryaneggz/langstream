@@ -39,7 +39,12 @@ async def construct_agent(params: LLMRequest | LLMStreamRequest):
 
     # Asynchronous LLM call
     agent = graph_builder(
-        graph_name=params.metadata.graph_id,
+        graph_id=(
+            params.metadata.graph_id 
+            if params.metadata 
+            and params.metadata.graph_id 
+            else 'react'    
+        ),
         model=params.model,
         tools=tools,
         prompt=prompt,
