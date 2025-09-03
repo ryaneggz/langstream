@@ -28,4 +28,7 @@ class MemoryService:
         await self.store.adelete(("memories",), key)
         return True
     
+    async def search(self) -> Any:
+        return await self.store.asearch(("memories",))
+    
 memory_service = MemoryService()

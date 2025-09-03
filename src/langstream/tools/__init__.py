@@ -1,9 +1,5 @@
-import json
 from langgraph.config import get_stream_writer
-from langchain_core.runnables.config import RunnableConfig
-from langgraph.config import get_store
 from .code import python_code_interpreter
-from ..services.memory import memory_service
 
 def get_weather(city: str) -> str:
     """Get weather for a given city."""
@@ -21,10 +17,5 @@ def get_weather(city: str) -> str:
     ]
     return random.choice(templates)
 
-async def get_user_info(config: RunnableConfig) -> str:
-    """Look up user info."""
-    user_info = await memory_service.get("user_1234")
-    return json.dumps(user_info.dict())
-
-TOOLS = [get_weather, get_user_info] + python_code_interpreter
+TOOLS = [get_weather] + python_code_interpreter
 
