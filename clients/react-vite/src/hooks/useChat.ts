@@ -6,10 +6,6 @@ export default function useChat() {
 	const responseRef = useRef("");
 	const toolCallChunkRef = useRef("");
 	const [messages, setMessages] = useState<any[]>([]);
-	const [toolCall, setToolCall] = useState<any>({});
-	// const [toolInput, setToolInput] = useState<any>('');
-	// const [toolOutput, setToolOutput] = useState<any>('');
-	// const [lastMessage, setLastMessage] = useState<any>('');
 
 	const clearContent = () => {
 		if (responseRef.current) {
@@ -96,8 +92,6 @@ export default function useChat() {
         toolCallChunkRef,
         sseHandler,
         clearContent,
-				setToolCall,
-				toolCall,
         messages,
 				setMessages
     };
