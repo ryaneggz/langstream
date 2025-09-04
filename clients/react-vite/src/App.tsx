@@ -17,12 +17,13 @@ function App() {
         setQuery("");
     };
 
-    const handleSSE = (query: string) => {
+    const handleSSE = (query: string, model: string = "openai:gpt-5-nano") => {
         // Add user message to the existing messages state
         const userMessage = {
             id: `user-${Date.now()}`,
-            role: "user",
+            model: model,
             content: query,
+            role: "user",
             type: "user",
         };
 
@@ -34,17 +35,13 @@ function App() {
 
         clearContent();
         const options = {
-            // autoReconnect: true,
-            // reconnectDelay: 3000,
-            // maxRetries: 3,
-            // useLastEventId: true,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Accept: "text/event-stream",
             },
             payload: JSON.stringify({
-                model: "openai:gpt-5-nano",
+                model: model,
                 stream_mode: "messages",
                 system: "You are a helpful assistant.",
                 messages: updatedMessages
@@ -100,6 +97,7 @@ function App() {
                         >
                             <h3 className="text-sm font-bold">
                                 {message.role || message.type}{" "}
+                                {message.type === "user" && `[${message.model}]`}
                                 {message.type === "tool" && `[${message.name}]`}
                             </h3>
                             <p>

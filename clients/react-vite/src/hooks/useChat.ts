@@ -29,11 +29,14 @@ export default function useChat() {
 				const existingMsg = history[existingIndex];
 				if (toolCallChunkRef.current) {
 					try {
-						existingMsg.input = JSON.parse(
-							toolCallChunkRef.current
-						);
+						existingMsg.input = JSON.parse(toolCallChunkRef.current);
 					} catch {
-						existingMsg.input = toolCallChunkRef.current;
+						try {
+							const autoAddCommas = "[" + toolCallChunkRef.current.replace(/}\s*{/g, "},{") + "]";
+							existingMsg.input = JSON.parse(autoAddCommas);
+						} catch {
+							existingMsg.input = toolCallChunkRef.current;
+						}
 					}
 				}
 				history[existingIndex] = {
