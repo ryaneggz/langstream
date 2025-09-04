@@ -99,7 +99,8 @@ function App() {
                             className="p-2 rounded-md bg-gray-100 my-2"
                         >
                             <h3 className="text-sm font-bold">
-                                {message.role || message.type}
+                                {message.role || message.type}{" "}
+                                {message.type === "tool" && `[${message.name}]`}
                             </h3>
                             <p>
                                 {message.content ||
