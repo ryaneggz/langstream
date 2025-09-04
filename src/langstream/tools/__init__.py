@@ -1,6 +1,7 @@
 from langgraph.config import get_stream_writer
 from .code import python_code_interpreter
 from .memory import *
+from datetime import datetime
 
 
 def get_weather(city: str) -> str:
@@ -19,5 +20,13 @@ def get_weather(city: str) -> str:
     ]
     return random.choice(templates)
 
+def get_time(city: str) -> str:
+    """Get the time in a given city."""
+    writer = get_stream_writer()
+    writer(f"Looking up data for city: {city}")
+    return datetime.now().strftime("%H:%M:%S")
 
-TOOLS = [get_weather] + python_code_interpreter
+TOOLS = (
+    [get_weather, get_time] 
+    # + python_code_interpreter
+)

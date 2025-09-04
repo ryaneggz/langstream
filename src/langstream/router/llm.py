@@ -30,12 +30,12 @@ async def construct_agent(params: LLMRequest | LLMStreamRequest):
     if config:
         ## Construct the prompt
         memory_prompt = await add_memories_to_system()
-        prompt = (
+        params.system = (
             params.system + "\n" + memory_prompt 
             if memory_prompt 
             else params.system
         )
-        tools = TOOLS + MEMORY_TOOLS
+        params.tools = params.tools + MEMORY_TOOLS
 
     # Asynchronous LLM call
     agent = graph_builder(
@@ -46,8 +46,8 @@ async def construct_agent(params: LLMRequest | LLMStreamRequest):
             else 'react'    
         ),
         model=params.model,
-        tools=tools,
-        prompt=prompt,
+        tools=params.tools,
+        prompt=params.system,
         checkpointer=in_memory_checkpointer if config else None,
         # store=in_memory_store if config else None,
     )
@@ -62,6 +62,7 @@ async def construct_agent(params: LLMRequest | LLMStreamRequest):
 async def llm_invoke(
     params: LLMRequest = Body(openapi_examples=Examples.LLM_INVOKE_EXAMPLES),
 ) -> dict[str, Any] | Any:
+    params = params.model_copy(update={"tools": params.tools + TOOLS})
     agent, config = await construct_agent(params)
 
     # Invoke the agent
@@ -81,6 +82,7 @@ async def llm_invoke(
 async def llm_stream(
     params: LLMStreamRequest = Body(openapi_examples=Examples.LLM_STREAM_EXAMPLES),
 ) -> StreamingResponse:
+    params = params.model_copy(update={"tools": params.tools + TOOLS})
     agent, config = await construct_agent(params)
 
     # Event generator

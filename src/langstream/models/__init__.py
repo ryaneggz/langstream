@@ -1,6 +1,7 @@
 from nanoid import generate
 from pydantic import BaseModel, Field
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Any, Callable
+from langchain_core.tools import BaseTool
 from uuid import uuid4
 from nanoid import generate
 
@@ -37,6 +38,7 @@ class ThreadSearch(BaseModel):
 class LLMRequest(BaseModel):
     model: str = "openai:gpt-5-nano"
     system: str = "You are a helpful assistant."
+    tools: list[BaseTool | Callable | dict[str, Any]] = []
     metadata: Optional[Config] = Field(
         default=None, description="LangGraph configuration"
     )
@@ -67,4 +69,4 @@ class LLMRequest(BaseModel):
 
 
 class LLMStreamRequest(LLMRequest):
-    stream_mode: StreamMode | list[StreamMode] = "values"
+    stream_mode: StreamMode | list[StreamMode] = "messages"
