@@ -22,6 +22,45 @@ export default function useChat() {
 
 	const handleMessages = (payload: any, history: any[]) => {
 		const response = payload[0];
+		// Handle Tool Input
+		if (response.tool_call_chunks && response.tool_call_chunks.length > 0) {
+			toolCallChunkRef.current += response.tool_call_chunks[0].args;
+			const existingIndex = history.findIndex((msg: any) => msg.id === response.id);
+			// if (existingIndex !== -1) {
+			// 	history[existingIndex].input = toolCallChunkRef.current;
+			// } else {
+			// 	history.push({
+			// 		...response,
+			// 		input: toolCallChunkRef.current,
+			// 	});
+			// }
+			if (existingIndex !== -1) {
+			// Consolidate tool_call_chunks for the message with matching id
+				const existingMsg = history[existingIndex];
+				if (toolCallChunkRef.current) {
+					try {
+						existingMsg.input = JSON.parse(
+							toolCallChunkRef.current
+						);
+					} catch {
+						existingMsg.input = toolCallChunkRef.current;
+					}
+				}
+				history[existingIndex] = {
+					...existingMsg,
+					...response,
+				};
+			} else {
+					history.push({
+						...response,
+						input: toolCallChunkRef.current,
+					});
+			}
+			setMessages((prev: any) => [...history]);
+			return;
+		}
+
+		// Handle Final Response & Tool Response
 		if (response.content && (!response.tool_call_chunks || response.tool_call_chunks.length === 0)) {
 			const existingIndex = history.findIndex((msg: any) => msg.id === response.id);
 			if (existingIndex !== -1) {
@@ -34,12 +73,14 @@ export default function useChat() {
 					content: updatedContent,
 				};
 				setMessages((prev: any) => [...history]);
+				return;
 			} else {
 				history.push({
 					...response,
 					content: response.content,
 				});
 				setMessages((prev: any) => [...history]);
+				return;
 			}
 		}
 	};

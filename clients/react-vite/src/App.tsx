@@ -75,7 +75,7 @@ function App() {
                 {messages.length > 0 && messages.map((message: any) => (
                     <div key={message.id} className="p-2 rounded-md bg-gray-100 my-2">
                         <h3 className="text-sm font-bold">{message.type}</h3>
-                        <p>{message.content}</p>
+                        <p>{message.content || JSON.stringify(message.input)}</p>
                     </div>
                 ))}
             </div>
