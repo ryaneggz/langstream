@@ -8,14 +8,30 @@ const in_mem_messages: any[] = [];
 
 function App() {
     const [query, setQuery] = useState("");
-    const { sseHandler, clearContent, messages, setMessages, lastMessage, toolInput, toolOutput } = useChatContext();
+    const { sseHandler, clearContent, messages, setMessages } =
+        useChatContext();
 
     const handleSubmit = () => {
         console.log("Submitted:", query);
         handleSSE(query);
+        setQuery("");
     };
 
     const handleSSE = (query: string) => {
+        // Add user message to the existing messages state
+        const userMessage = {
+            id: `user-${Date.now()}`,
+            role: "user",
+            content: query,
+            type: "user",
+        };
+
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+
+        // Add user message to in-memory messages for SSE handling
+        in_mem_messages.push(userMessage);
+
         clearContent();
         const options = {
             // autoReconnect: true,
@@ -31,7 +47,12 @@ function App() {
                 model: "openai:gpt-5-nano",
                 stream_mode: "messages",
                 system: "You are a helpful assistant.",
-                messages: [{ role: "user", content: query }],
+                messages: updatedMessages
+                    .filter((msg) => msg.role === "user" || msg.role === "assistant")
+                    .map((msg) => ({
+                        role: msg.role,
+                        content: msg.content,
+                    })),
             }),
         };
         var source = new SSE("http://localhost:8000/llm/stream", options);
@@ -39,7 +60,6 @@ function App() {
             // Assuming we receive JSON-encoded data payloads:
             let payload = JSON.parse(e.data);
             sseHandler(payload, in_mem_messages, "messages");
-            setMessages(in_mem_messages);
         });
 
         source.addEventListener("error", (e: any) => {
@@ -70,27 +90,23 @@ function App() {
                     Submit
                 </Button>
             </div>
-            <div className="w-full h-full overflow-y-auto">
+            <div className="w-full h-full overflow-y-auto p-4">
                 {/* {JSON.stringify(messages, null, 2)} */}
-                {messages.length > 0 && (
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-md shadow-sm">
-                        {toolInput && (
-                            <div className="text-xs text-blue-700 bg-blue-50 px-3 py-2 rounded">
-                                <span className="font-semibold">Tool Input:</span> {toolInput}
-                            </div>
-                        )}
-                        {toolOutput && (
-                            <div className="text-xs text-green-700 bg-green-50 px-3 py-2 rounded">
-                                <span className="font-semibold">Tool Output:</span> {toolOutput}
-                            </div>
-                        )}
-                        {lastMessage && (
-                            <div className="text-base text-gray-800 bg-white px-3 py-2 rounded border">
-                                {lastMessage}
-                            </div>
-                        )}
-                    </div>
-                )}
+                {messages.length > 0 &&
+                    messages.map((message: any) => (
+                        <div
+                            key={message.id}
+                            className="p-2 rounded-md bg-gray-100 my-2"
+                        >
+                            <h3 className="text-sm font-bold">
+                                {message.role || message.type}
+                            </h3>
+                            <p>
+                                {message.content ||
+                                    JSON.stringify(message.input)}
+                            </p>
+                        </div>
+                    ))}
             </div>
         </div>
     );
