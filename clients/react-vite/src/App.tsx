@@ -13,6 +13,7 @@ function App() {
     const handleSubmit = () => {
         console.log("Submitted:", query);
         handleSSE(query);
+        setQuery("");
     };
 
     const handleSSE = (query: string) => {
@@ -69,11 +70,12 @@ function App() {
                     Submit
                 </Button>
             </div>
-            <div className="w-full h-full overflow-y-auto">
+            <div className="w-full h-full overflow-y-auto p-4">
                 {/* {JSON.stringify(messages, null, 2)} */}
                 {messages.length > 0 && messages.map((message: any) => (
-                    <div key={message.id}>
-                        {message.content}
+                    <div key={message.id} className="p-2 rounded-md bg-gray-100 my-2">
+                        <h3 className="text-sm font-bold">{message.type}</h3>
+                        <p>{message.content}</p>
                     </div>
                 ))}
             </div>
