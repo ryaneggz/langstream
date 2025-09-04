@@ -8,7 +8,8 @@ const in_mem_messages: any[] = [];
 
 function App() {
     const [query, setQuery] = useState("");
-    const { sseHandler, clearContent, messages } = useChatContext();
+    const { sseHandler, clearContent, messages, setMessages } =
+        useChatContext();
 
     const handleSubmit = () => {
         console.log("Submitted:", query);
@@ -17,6 +18,20 @@ function App() {
     };
 
     const handleSSE = (query: string) => {
+        // Add user message to the existing messages state
+        const userMessage = {
+            id: `user-${Date.now()}`,
+            role: "user",
+            content: query,
+            type: "user",
+        };
+
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+
+        // Add user message to in-memory messages for SSE handling
+        in_mem_messages.push(userMessage);
+
         clearContent();
         const options = {
             // autoReconnect: true,
@@ -32,7 +47,12 @@ function App() {
                 model: "openai:gpt-5-nano",
                 stream_mode: "messages",
                 system: "You are a helpful assistant.",
-                messages: [{ role: "user", content: query }],
+                messages: updatedMessages
+                    .filter((msg) => msg.role === "user" || msg.role === "assistant")
+                    .map((msg) => ({
+                        role: msg.role,
+                        content: msg.content,
+                    })),
             }),
         };
         var source = new SSE("http://localhost:8000/llm/stream", options);
@@ -72,12 +92,21 @@ function App() {
             </div>
             <div className="w-full h-full overflow-y-auto p-4">
                 {/* {JSON.stringify(messages, null, 2)} */}
-                {messages.length > 0 && messages.map((message: any) => (
-                    <div key={message.id} className="p-2 rounded-md bg-gray-100 my-2">
-                        <h3 className="text-sm font-bold">{message.type}</h3>
-                        <p>{message.content || JSON.stringify(message.input)}</p>
-                    </div>
-                ))}
+                {messages.length > 0 &&
+                    messages.map((message: any) => (
+                        <div
+                            key={message.id}
+                            className="p-2 rounded-md bg-gray-100 my-2"
+                        >
+                            <h3 className="text-sm font-bold">
+                                {message.role || message.type}
+                            </h3>
+                            <p>
+                                {message.content ||
+                                    JSON.stringify(message.input)}
+                            </p>
+                        </div>
+                    ))}
             </div>
         </div>
     );

@@ -72,6 +72,7 @@ export default function useChat() {
 				history.push({
 					...response,
 					content: response.content,
+					role: response.type === "tool" ? "tool" : "assistant",
 				});
 				setMessages((prev: any) => [...history]);
 				return;
