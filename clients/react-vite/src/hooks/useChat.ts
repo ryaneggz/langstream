@@ -26,14 +26,8 @@ export default function useChat() {
 		if (response.tool_call_chunks && response.tool_call_chunks.length > 0) {
 			toolCallChunkRef.current += response.tool_call_chunks[0].args;
 			const existingIndex = history.findIndex((msg: any) => msg.id === response.id);
-			// if (existingIndex !== -1) {
-			// 	history[existingIndex].input = toolCallChunkRef.current;
-			// } else {
-			// 	history.push({
-			// 		...response,
-			// 		input: toolCallChunkRef.current,
-			// 	});
-			// }
+
+			// If the message already exists, update it
 			if (existingIndex !== -1) {
 			// Consolidate tool_call_chunks for the message with matching id
 				const existingMsg = history[existingIndex];
