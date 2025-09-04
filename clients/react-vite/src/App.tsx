@@ -8,7 +8,7 @@ const in_mem_messages: any[] = [];
 
 function App() {
     const [query, setQuery] = useState("");
-    const { sseHandler, clearContent, messages, setMessages, lastMessage, toolInput, toolOutput } = useChatContext();
+    const { sseHandler, clearContent, messages } = useChatContext();
 
     const handleSubmit = () => {
         console.log("Submitted:", query);
@@ -39,7 +39,6 @@ function App() {
             // Assuming we receive JSON-encoded data payloads:
             let payload = JSON.parse(e.data);
             sseHandler(payload, in_mem_messages, "messages");
-            setMessages(in_mem_messages);
         });
 
         source.addEventListener("error", (e: any) => {
@@ -72,25 +71,11 @@ function App() {
             </div>
             <div className="w-full h-full overflow-y-auto">
                 {/* {JSON.stringify(messages, null, 2)} */}
-                {messages.length > 0 && (
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-md shadow-sm">
-                        {toolInput && (
-                            <div className="text-xs text-blue-700 bg-blue-50 px-3 py-2 rounded">
-                                <span className="font-semibold">Tool Input:</span> {toolInput}
-                            </div>
-                        )}
-                        {toolOutput && (
-                            <div className="text-xs text-green-700 bg-green-50 px-3 py-2 rounded">
-                                <span className="font-semibold">Tool Output:</span> {toolOutput}
-                            </div>
-                        )}
-                        {lastMessage && (
-                            <div className="text-base text-gray-800 bg-white px-3 py-2 rounded border">
-                                {lastMessage}
-                            </div>
-                        )}
+                {messages.length > 0 && messages.map((message: any) => (
+                    <div key={message.id}>
+                        {message.content}
                     </div>
-                )}
+                ))}
             </div>
         </div>
     );
