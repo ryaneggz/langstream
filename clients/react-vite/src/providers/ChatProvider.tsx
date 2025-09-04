@@ -3,14 +3,14 @@ import useChat from "@/hooks/useChat";
 
 export const ChatContext = createContext({});
 
-export default function FlowProvider({
+export default function ChatProvider({
     children,
 }: {
     children: React.ReactNode;
 }) {
     const chatHooks = useChat();
     return (
-        <ChatContext.Provider value={chatHooks}>
+        <ChatContext.Provider value={{...chatHooks}}>
             {children}
         </ChatContext.Provider>
     );

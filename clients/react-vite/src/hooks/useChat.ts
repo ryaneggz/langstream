@@ -1,11 +1,82 @@
 import { useRef, useState } from "react";
+import { SSE } from "sse.js";
 
 type StreamMode = "messages" | "values" | "updates" | "debug" | "tasks";
 
-export default function useChat() {
+const in_mem_messages: any[] = [];
+
+export type ChatContextType = {
+	responseRef: React.RefObject<string>;
+	toolCallChunkRef: React.RefObject<string>;
+	query: string;
+	setQuery: (query: string) => void;
+	handleSubmit: () => void;
+	sseHandler: (payload: any, messages: any[], stream_mode: StreamMode | Array<StreamMode>) => void;
+	clearContent: () => void;
+	messages: any[];
+	setMessages: (messages: any[]) => void;
+}
+
+export default function useChat(): ChatContextType {
 	const responseRef = useRef("");
 	const toolCallChunkRef = useRef("");
+	const [query, setQuery] = useState("");
 	const [messages, setMessages] = useState<any[]>([]);
+
+	const handleSSE = (query: string, model: string = "openai:gpt-5-nano") => {
+			// Add user message to the existing messages state
+			const userMessage = {
+					id: `user-${Date.now()}`,
+					model: model,
+					content: query,
+					role: "user",
+					type: "user",
+			};
+
+			const updatedMessages = [...messages, userMessage];
+			setMessages(updatedMessages);
+
+			// Add user message to in-memory messages for SSE handling
+			in_mem_messages.push(userMessage);
+
+			clearContent();
+			const options = {
+				method: "POST",
+				headers: {
+						"Content-Type": "application/json",
+						Accept: "text/event-stream",
+				},
+				payload: JSON.stringify({
+					model: model,
+					stream_mode: "messages",
+					system: "You are a helpful assistant.",
+					messages: updatedMessages
+						.filter(
+							(msg) => msg.role === "user" || msg.role === "assistant"
+						)
+						.map((msg) => ({
+							role: msg.role,
+							content: msg.content,
+						})),
+				}),
+			};
+			var source = new SSE("http://localhost:8000/llm/stream", options);
+			source.addEventListener("message", function (e: any) {
+				// Assuming we receive JSON-encoded data payloads:
+				let payload = JSON.parse(e.data);
+				sseHandler(payload, in_mem_messages, "messages");
+			});
+
+			source.addEventListener("error", (e: any) => {
+				console.error("Error:", e);
+			});
+	};
+
+	const handleSubmit = () => {
+			console.log("Submitted:", query);
+			handleSSE(query);
+			setQuery("");
+	};
 
 	const clearContent = () => {
 		if (responseRef.current) {
@@ -80,22 +151,25 @@ export default function useChat() {
 	};
 
 	function sseHandler(
-			payload: any,
-			messages: any[],
-			stream_mode: StreamMode | Array<StreamMode> = "messages"
-    ) {
-			if (stream_mode === "messages" || stream_mode.includes("messages")) {
-				console.log("messages: ", payload);
-				handleMessages(payload, messages);
-			}
-    }
+		payload: any,
+		messages: any[],
+		stream_mode: StreamMode | Array<StreamMode> = "messages"
+	) {
+		if (stream_mode === "messages" || stream_mode.includes("messages")) {
+			console.log("messages: ", payload);
+			handleMessages(payload, messages);
+		}
+	}
 
 	return {
-        responseRef,
-        toolCallChunkRef,
-        sseHandler,
-        clearContent,
-        messages,
-				setMessages
-    };
+		responseRef,
+		toolCallChunkRef,
+		handleSubmit,
+		sseHandler,
+		clearContent,
+		query,
+		setQuery,
+		messages,
+		setMessages,
+	};
 }

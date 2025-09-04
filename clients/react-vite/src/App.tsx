@@ -1,68 +1,11 @@
-import { SSE } from "sse.js";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { useChatContext } from "@/providers/chat-provider";
-
-const in_mem_messages: any[] = [];
+import { useChatContext } from "@/providers/ChatProvider";
+import { type ChatContextType } from "@/hooks/useChat";
 
 function App() {
-    const [query, setQuery] = useState("");
-    const { sseHandler, clearContent, messages, setMessages } =
-        useChatContext();
-
-    const handleSubmit = () => {
-        console.log("Submitted:", query);
-        handleSSE(query);
-        setQuery("");
-    };
-
-    const handleSSE = (query: string, model: string = "openai:gpt-5-nano") => {
-        // Add user message to the existing messages state
-        const userMessage = {
-            id: `user-${Date.now()}`,
-            model: model,
-            content: query,
-            role: "user",
-            type: "user",
-        };
-
-        const updatedMessages = [...messages, userMessage];
-        setMessages(updatedMessages);
-
-        // Add user message to in-memory messages for SSE handling
-        in_mem_messages.push(userMessage);
-
-        clearContent();
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "text/event-stream",
-            },
-            payload: JSON.stringify({
-                model: model,
-                stream_mode: "messages",
-                system: "You are a helpful assistant.",
-                messages: updatedMessages
-                    .filter((msg) => msg.role === "user" || msg.role === "assistant")
-                    .map((msg) => ({
-                        role: msg.role,
-                        content: msg.content,
-                    })),
-            }),
-        };
-        var source = new SSE("http://localhost:8000/llm/stream", options);
-        source.addEventListener("message", function (e: any) {
-            // Assuming we receive JSON-encoded data payloads:
-            let payload = JSON.parse(e.data);
-            sseHandler(payload, in_mem_messages, "messages");
-        });
-
-        source.addEventListener("error", (e: any) => {
-            console.error("Error:", e);
-        });
-    };
+    const { query, setQuery, handleSubmit, messages } =
+        useChatContext() as ChatContextType;
 
     return (
         <div className="fixed inset-0 flex flex-col w-full h-full">
@@ -97,7 +40,8 @@ function App() {
                         >
                             <h3 className="text-sm font-bold">
                                 {message.role || message.type}{" "}
-                                {message.type === "user" && `[${message.model}]`}
+                                {message.type === "user" &&
+                                    `[${message.model}]`}
                                 {message.type === "tool" && `[${message.name}]`}
                             </h3>
                             <p>
