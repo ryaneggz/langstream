@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import apiClient from '@/lib/api';
 
 export type ThreadContextType = {
 	threads: any[];
@@ -8,7 +9,7 @@ export type ThreadContextType = {
 	setCheckpoints: (checkpoints: any[]) => void;
 	checkpoint: any;
 	setCheckpoint: (checkpoint: any) => void;
-	searchThreads: (action: string, metadata: {thread_id?: string, checkpoint_id?: string}) => void;
+	searchThreads: (action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint', metadata: {thread_id?: string, checkpoint_id?: string}) => void;
 	useListThreadsEffect: (trigger?: boolean) => void;
 };
 
@@ -18,45 +19,17 @@ export default function useThread(): ThreadContextType {
 	const [checkpoint, setCheckpoint] = useState<any>(null);
 
 	const searchThreads = async (
-		action: string,
+		action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint',
 		metadata: {thread_id?: string, checkpoint_id?: string} = {}
 	) => {
-		let payload;
-		if (action === 'list_threads') {
-			payload = {
-				limit: 10,
-				offset: 0,
-				metadata: metadata,
-			};
-		} else if (action === 'list_checkpoints') {
-			payload = {
-				limit: 10,
-				offset: 0,
-				metadata: { thread_id: metadata.thread_id },
-			};
-		} else if (action === 'get_checkpoint') {
-			payload = {
-				limit: 10,
-				offset: 0,
-				metadata: { thread_id: metadata.thread_id, checkpoint_id: metadata.checkpoint_id },
-			};
-		}
-		
-		const response = await fetch('http://localhost:8000/threads/search', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(payload),
-		});
-		const data = await response.json();
+		const data = await apiClient.searchThreads(action, metadata);
 		
 		if (action === 'list_threads') {
-			setThreads(data.threads);
+			setThreads(data);
 		} else if (action === 'list_checkpoints') {
-			setCheckpoints(data.checkpoints);
+			setCheckpoints(data);
 		} else if (action === 'get_checkpoint') {
-			setCheckpoint(data.checkpoint);
+			setCheckpoint(data);
 		}
 	};
 

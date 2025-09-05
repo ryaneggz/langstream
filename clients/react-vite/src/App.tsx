@@ -6,27 +6,34 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatContext } from "@/providers/ChatProvider";
 import { type ChatContextType } from "@/hooks/useChat";
 import { type ThreadContextType } from "@/hooks/useThread";
+import { formatMessages } from "./lib/utils";
 
 function App() {
-	const { useListThreadsEffect, threads } = useChatContext() as ThreadContextType;	
-	const { query, setQuery, handleSubmit, messages, metadata, setMetadata } =
+	const { useListThreadsEffect, threads, checkpoint } = useChatContext() as ThreadContextType;	
+	const { query, setQuery, handleSubmit, messages, setMessages, metadata, setMetadata } =
 		useChatContext() as ChatContextType;
 	const [currentTab, setCurrentTab] = useState("messages");
 	const bottomRef = useRef<HTMLDivElement>(null);
 
+	// Set current tab to messages when query changes
 	useEffect(() => {
 		setCurrentTab("messages");
 	}, [query]);
 
-	useEffect(() => {
-		setCurrentTab("messages");
-	}, [query]);
-
+	// Fetch threads when current tab is threads
 	useListThreadsEffect(currentTab === "threads");
 
+	// Scroll to bottom of messages when messages change
 	useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
+
+	// Set messages when checkpoint changes
+	useEffect(() => {
+		if (checkpoint && checkpoint.channel_values) {
+			setMessages(checkpoint.channel_values.messages);
+		}
+	}, [checkpoint]);
 
 	return (
 		<div className="flex flex-col w-full h-screen">
@@ -34,10 +41,10 @@ function App() {
 				<Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col">
 					<div className="p-4 pb-0">
 						<TabsList>
-							<TabsTrigger value="messages">Messages</TabsTrigger>
-							<TabsTrigger value="threads">Threads</TabsTrigger>
-							<TabsTrigger value="tools">Tools</TabsTrigger>
-							<TabsTrigger value="settings">Settings</TabsTrigger>
+							<TabsTrigger className="cursor-pointer" value="messages">Messages</TabsTrigger>
+							<TabsTrigger className="cursor-pointer" value="threads">Threads</TabsTrigger>
+							<TabsTrigger className="cursor-pointer" value="tools">Tools</TabsTrigger>
+							<TabsTrigger className="cursor-pointer" value="settings">Settings</TabsTrigger>
 						</TabsList>
 					</div>
 					<TabsContent
@@ -80,12 +87,17 @@ function App() {
 									{threads.map((thread: any, index: number) => (
 										<div
 											key={thread.thread_id || index}
-											className="p-3 rounded-md bg-gray-100 border"
+											className="p-3 rounded-md bg-gray-100 border cursor-pointer"
+											onClick={() => {
+												setMessages(formatMessages(thread.checkpoint.channel_values.messages))
+												setMetadata(JSON.stringify({ thread_id: thread.thread_id}))
+												setCurrentTab("messages");
+											}}
 										>
 											<div className="flex justify-between items-start">
 												<div className="flex-1">
 													<h4 className="text-sm font-medium">
-														Thread {thread.thread_id}
+														{thread.thread_id}
 													</h4>
 													{thread.updated_at && (
 														<p className="text-xs text-gray-500 mt-1">
