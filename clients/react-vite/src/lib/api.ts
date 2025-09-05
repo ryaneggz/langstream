@@ -15,25 +15,27 @@ class ApiClient {
 
 	async searchThreads(
 		action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint',
-		metadata: {thread_id?: string, checkpoint_id?: string} = {}
+		metadata: {thread_id?: string, checkpoint_id?: string} = {},
+		limit: number = 100,
+		offset: number = 0,
 	) {
 		let payload;
 		if (action === 'list_threads') {
 			payload = {
-				limit: 10,
-				offset: 0,
+				limit: limit,
+				offset: offset,
 				metadata: metadata,
 			};
 		} else if (action === 'list_checkpoints') {
 			payload = {
-				limit: 10,
-				offset: 0,
+				limit: limit,
+				offset: offset,
 				metadata: { thread_id: metadata.thread_id },
 			};
 		} else if (action === 'get_checkpoint') {
 			payload = {
-				limit: 10,
-				offset: 0,
+				limit: limit,
+				offset: offset,
 				metadata: { thread_id: metadata.thread_id, checkpoint_id: metadata.checkpoint_id },
 			};
 		}

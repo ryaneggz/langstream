@@ -6,18 +6,18 @@ class Examples:
         "list_threads": Example(
             summary="list_threads",
             description="List Threads in Checkpointer",
-            value={"limit": 10, "offset": 0, "metadata": {}},
+            value={"limit": 100, "offset": 0, "metadata": {}},
         ),
         "list_checkpoints": Example(
             summary="list_checkpoints",
             description="List Checkpoints for Thread",
-            value={"limit": 10, "offset": 0, "metadata": {"thread_id": "thread_123"}},
+            value={"limit": 100, "offset": 0, "metadata": {"thread_id": "thread_123"}},
         ),
         "get_checkpoint": Example(
             summary="get_checkpoint",
             description="Get Checkpoint for Thread",
             value={
-                "limit": 10,
+                "limit": 100,
                 "offset": 0,
                 "metadata": {
                     "thread_id": "thread_123",
