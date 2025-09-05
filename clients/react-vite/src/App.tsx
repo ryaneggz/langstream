@@ -7,7 +7,7 @@ import { type ChatContextType } from "@/hooks/useChat";
 import { type ThreadContextType } from "@/hooks/useThread";
 
 function App() {
-	const { useListThreadsEffect } = useChatContext() as ThreadContextType;	
+	const { useListThreadsEffect, threads } = useChatContext() as ThreadContextType;	
 	const { query, setQuery, handleSubmit, messages, metadata, setMetadata } =
 		useChatContext() as ChatContextType;
 	const [currentTab, setCurrentTab] = useState("messages");
@@ -16,7 +16,11 @@ function App() {
 		setCurrentTab("messages");
 	}, [query]);
 
-	useListThreadsEffect();
+	useEffect(() => {
+		setCurrentTab("messages");
+	}, [query]);
+
+	useListThreadsEffect(currentTab === "threads");
 
 	return (
 		<div className="fixed inset-0 flex flex-col w-full h-full">
@@ -90,13 +94,43 @@ function App() {
 						className="flex-1 overflow-y-auto p-4 pt-0"
 					>
 						<div className="pt-4">
-							<div className="text-center text-muted-foreground">
-								<p>Threads feature coming soon...</p>
-								<p className="text-sm mt-2">
-										This will show conversation threads and chat
-										history.
-								</p>
-							</div>
+							{threads.length > 0 ? (
+								<div className="space-y-2">
+									{threads.map((thread: any, index: number) => (
+										<div
+											key={thread.thread_id || index}
+											className="p-3 rounded-md bg-gray-100 border"
+										>
+											<div className="flex justify-between items-start">
+												<div className="flex-1">
+													<h4 className="text-sm font-medium">
+														Thread {thread.thread_id}
+													</h4>
+													{thread.updated_at && (
+														<p className="text-xs text-gray-500 mt-1">
+															Updated: {new Date(thread.updated_at).toLocaleString()}
+														</p>
+													)}
+												</div>
+											</div>
+											{thread.metadata && (
+												<div className="mt-2">
+													<pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+														{JSON.stringify(thread.metadata, null, 2)}
+													</pre>
+												</div>
+											)}
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="text-center text-muted-foreground">
+									<p>No threads found</p>
+									<p className="text-sm mt-2">
+										Start a conversation to create your first thread.
+									</p>
+								</div>
+							)}
 						</div>
 					</TabsContent>
 					<TabsContent
