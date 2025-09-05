@@ -1,0 +1,61 @@
+class ApiClient {	
+	readonly apiUrl: string;
+
+	constructor(apiUrl: string) {
+		this.apiUrl = apiUrl;
+	}
+
+	async invoke(model: string, system: string, messages: any[]) {
+		const response = await fetch(`${this.apiUrl}/llm/invoke`, {
+			method: "POST",
+			body: JSON.stringify({ model, system, messages }),
+		});
+		return response
+	}
+
+	async searchThreads(
+		action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint',
+		metadata: {thread_id?: string, checkpoint_id?: string} = {}
+	) {
+		let payload;
+		if (action === 'list_threads') {
+			payload = {
+				limit: 10,
+				offset: 0,
+				metadata: metadata,
+			};
+		} else if (action === 'list_checkpoints') {
+			payload = {
+				limit: 10,
+				offset: 0,
+				metadata: { thread_id: metadata.thread_id },
+			};
+		} else if (action === 'get_checkpoint') {
+			payload = {
+				limit: 10,
+				offset: 0,
+				metadata: { thread_id: metadata.thread_id, checkpoint_id: metadata.checkpoint_id },
+			};
+		}
+		const response = await fetch(`${this.apiUrl}/threads/search`, {
+			method: "POST",
+			headers: {
+					"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		});
+		const data = await response.json();
+
+		if (action === "list_threads") {
+				return data.threads;
+		} else if (action === "list_checkpoints") {
+				return data.checkpoints;
+		} else if (action === "get_checkpoint") {
+				return data.checkpoint;
+		}
+	}
+}
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const apiClient = new ApiClient(API_URL);
+export default apiClient;

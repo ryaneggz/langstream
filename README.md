@@ -158,12 +158,12 @@ GOOGLE_API_KEY=your_google_api_key
 
 ### Planned Enhancements
 - [ ] Authentication and authorization
-- [ ] Streamlit Chat Interface
+- [x] React-Vite Chat Interface
 - [ ] Request/response caching
 - [x] Persistent conversation history
 - [x] Docker containerization
 - [ ] Integration tests and CI/CD pipeline
-- [ ] [LangGraph Memory Store](https://langchain-ai.github.io/langgraph/concepts/memory/#memory-storage)
+- [x] [LangGraph Memory Store](https://langchain-ai.github.io/langgraph/concepts/memory/#memory-storage)
 
 ## Tech Stack
 

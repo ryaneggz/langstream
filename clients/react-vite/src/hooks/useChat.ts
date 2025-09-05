@@ -15,6 +15,8 @@ export type ChatContextType = {
 	clearContent: () => void;
 	messages: any[];
 	setMessages: (messages: any[]) => void;
+	metadata: string;
+	setMetadata: (metadata: string) => void;
 }
 
 export default function useChat(): ChatContextType {
@@ -22,60 +24,65 @@ export default function useChat(): ChatContextType {
 	const toolCallChunkRef = useRef("");
 	const [query, setQuery] = useState("");
 	const [messages, setMessages] = useState<any[]>([]);
+	const [metadata, setMetadata] = useState(() => {
+		const threadId = `thread_${Math.random().toString(36).substring(2, 15)}`;
+		return JSON.stringify({ thread_id: threadId }, null, 2);
+	});
 
 	const handleSSE = (query: string, model: string = "openai:gpt-5-nano") => {
-			// Add user message to the existing messages state
-			const userMessage = {
-					id: `user-${Date.now()}`,
-					model: model,
-					content: query,
-					role: "user",
-					type: "user",
-			};
+		// Add user message to the existing messages state
+		const userMessage = {
+			id: `user-${Date.now()}`,
+			model: model,
+			content: query,
+			role: "user",
+			type: "user",
+		};
 
-			const updatedMessages = [...messages, userMessage];
-			setMessages(updatedMessages);
+		const updatedMessages = [...messages, userMessage];
+		setMessages(updatedMessages);
 
-			// Add user message to in-memory messages for SSE handling
-			in_mem_messages.push(userMessage);
+		// Add user message to in-memory messages for SSE handling
+		in_mem_messages.push(userMessage);
 
-			clearContent();
-			const options = {
-				method: "POST",
-				headers: {
-						"Content-Type": "application/json",
-						Accept: "text/event-stream",
-				},
-				payload: JSON.stringify({
-					model: model,
-					stream_mode: "messages",
-					system: "You are a helpful assistant.",
-					messages: updatedMessages
-						.filter(
-							(msg) => msg.role === "user" || msg.role === "assistant"
-						)
-						.map((msg) => ({
-							role: msg.role,
-							content: msg.content,
-						})),
-				}),
-			};
-			var source = new SSE("http://localhost:8000/llm/stream", options);
-			source.addEventListener("message", function (e: any) {
-				// Assuming we receive JSON-encoded data payloads:
-				let payload = JSON.parse(e.data);
-				sseHandler(payload, in_mem_messages, "messages");
-			});
+		clearContent();
+		const options = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "text/event-stream",
+			},
+			payload: JSON.stringify({
+				model: model,
+				stream_mode: "messages",
+				system: "You are a helpful assistant.",
+				metadata: JSON.parse(metadata),
+				messages: updatedMessages
+					.filter(
+						(msg) => msg.role === "user" || msg.role === "assistant"
+					)
+					.map((msg) => ({
+						role: msg.role,
+						content: msg.content,
+					})),
+			}),
+		};
+		const source = new SSE("http://localhost:8000/llm/stream", options);
+		source.addEventListener("message", function (e: any) {
+			// Assuming we receive JSON-encoded data payloads:
+			const payload = JSON.parse(e.data);
+			sseHandler(payload, in_mem_messages, "messages");
+		});
 
-			source.addEventListener("error", (e: any) => {
-				console.error("Error:", e);
-			});
+		source.addEventListener("error", (e: any) => {
+			console.error("Error:", e);
+		});
 	};
 
 	const handleSubmit = () => {
-			console.log("Submitted:", query);
-			handleSSE(query);
-			setQuery("");
+		console.log("Submitted:", query);
+		handleSSE(query);
+		setQuery("");
 	};
 
 	const clearContent = () => {
@@ -115,10 +122,10 @@ export default function useChat(): ChatContextType {
 					...response,
 				};
 			} else {
-					history.push({
-						...response,
-						input: toolCallChunkRef.current,
-					});
+				history.push({
+					...response,
+					input: toolCallChunkRef.current,
+				});
 			}
 			setMessages((prev: any) => [...history]);
 			return;
@@ -171,5 +178,7 @@ export default function useChat(): ChatContextType {
 		setQuery,
 		messages,
 		setMessages,
+		metadata,
+		setMetadata,
 	};
 }
