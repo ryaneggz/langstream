@@ -19,7 +19,7 @@ class CheckpointService:
         for thread_id in filtered_list[: thread_search.limit]:
             checkpoint = await self.get_checkpoint(thread_id)
             final_list.append({"thread_id": thread_id, "checkpoint": checkpoint})
-        return final_list
+        return sorted(final_list, key=lambda x: x["checkpoint"]["ts"], reverse=True)
 
     async def list_checkpoints(self, thread_id: str):
         config = RunnableConfig(configurable={"thread_id": thread_id})

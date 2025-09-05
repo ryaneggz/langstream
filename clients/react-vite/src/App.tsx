@@ -42,7 +42,7 @@ function App() {
 					<div className="p-4 pb-0">
 						<TabsList>
 							<TabsTrigger className="cursor-pointer" value="messages">Messages</TabsTrigger>
-							<TabsTrigger className="cursor-pointer" value="threads">Threads</TabsTrigger>
+							<TabsTrigger className="cursor-pointer" value="threads">Threads <span className="text-gray-500">{threads.length}</span></TabsTrigger>
 							<TabsTrigger className="cursor-pointer" value="tools">Tools</TabsTrigger>
 							<TabsTrigger className="cursor-pointer" value="settings">Settings</TabsTrigger>
 						</TabsList>
@@ -99,17 +99,17 @@ function App() {
 													<h4 className="text-sm font-medium">
 														{thread.thread_id}
 													</h4>
-													{thread.updated_at && (
+													{thread.checkpoint.ts && (
 														<p className="text-xs text-gray-500 mt-1">
-															Updated: {new Date(thread.updated_at).toLocaleString()}
+															Updated: {new Date(thread.checkpoint.ts).toLocaleString()}
 														</p>
 													)}
 												</div>
 											</div>
-											{thread.metadata && (
+											{thread.checkpoint.channel_values.messages.length > 0 && (
 												<div className="mt-2">
-													<pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
-														{JSON.stringify(thread.metadata, null, 2)}
+													<pre className="bg-gray-50 p-2 rounded overflow-x-auto">
+														{JSON.stringify(thread.checkpoint.channel_values.messages[thread.checkpoint.channel_values.messages.length-1].content, null, 2)}
 													</pre>
 												</div>
 											)}
