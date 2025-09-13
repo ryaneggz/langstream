@@ -16,7 +16,7 @@ class CheckpointService:
         thread_ids = list(self.checkpointer.storage.keys())
         filtered_list = [item for item in thread_ids if item is not None]
         final_list = []
-        for thread_id in filtered_list[: thread_search.limit]:
+        for thread_id in filtered_list[:thread_search.limit]:
             checkpoint = await self.get_checkpoint(thread_id)
             final_list.append({"thread_id": thread_id, "checkpoint": checkpoint})
         return sorted(final_list, key=lambda x: x["checkpoint"]["ts"], reverse=True)
@@ -47,6 +47,12 @@ class CheckpointService:
         )
         checkpoint = await self.checkpointer.aget(config)
         return checkpoint
+
+    async def delete_thread(self, thread_id: str) -> bool:
+        if thread_id in self.checkpointer.storage:
+            del self.checkpointer.storage[thread_id]
+            return True
+        return False
 
 
 checkpoint_service = CheckpointService()

@@ -1,3 +1,4 @@
+import { type ThreadAction } from "@/hooks/useThread";
 class ApiClient {	
 	readonly apiUrl: string;
 
@@ -14,7 +15,7 @@ class ApiClient {
 	}
 
 	async searchThreads(
-		action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint',
+		action: ThreadAction,
 		metadata: {thread_id?: string, checkpoint_id?: string} = {},
 		limit: number = 100,
 		offset: number = 0,
@@ -55,6 +56,16 @@ class ApiClient {
 		} else if (action === "get_checkpoint") {
 				return data.checkpoint;
 		}
+	}
+
+	async deleteThread(thread_id: string) {
+		const response = await fetch(`${this.apiUrl}/threads/${thread_id}`, {
+			method: "DELETE",
+		});
+		if (!response.ok) {
+			throw new Error(`Failed to delete thread: ${response.statusText}`);
+		}
+		return response.json();
 	}
 }
 

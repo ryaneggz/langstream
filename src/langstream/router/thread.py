@@ -31,3 +31,11 @@ async def search_threads(
     return {
         "threads": await checkpoint_service.search_threads(thread_search=thread_search)
     }
+
+
+@thread_router.delete("/{thread_id}", name="Delete Thread")
+async def delete_thread(thread_id: str):
+    success = await checkpoint_service.delete_thread(thread_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    return {"message": f"Thread {thread_id} deleted successfully"}

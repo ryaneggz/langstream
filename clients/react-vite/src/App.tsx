@@ -7,9 +7,10 @@ import { useChatContext } from "@/providers/ChatProvider";
 import { type ChatContextType } from "@/hooks/useChat";
 import { type ThreadContextType } from "@/hooks/useThread";
 import { formatMessages } from "./lib/utils";
+import apiClient from "@/lib/api";
 
 function App() {
-	const { useListThreadsEffect, threads, checkpoint } = useChatContext() as ThreadContextType;	
+	const { useListThreadsEffect, threads, checkpoint, searchThreads } = useChatContext() as ThreadContextType;
 	const { query, setQuery, handleSubmit, messages, setMessages, metadata, setMetadata } =
 		useChatContext() as ChatContextType;
 	const [currentTab, setCurrentTab] = useState("messages");
@@ -34,6 +35,22 @@ function App() {
 			setMessages(checkpoint.channel_values.messages);
 		}
 	}, [checkpoint]);
+
+	const handleDeleteThread = async (thread_id: string) => {
+		try {
+			await apiClient.deleteThread(thread_id);
+			// Refresh threads list
+			searchThreads('list_threads', {});
+			// Clear messages if the deleted thread was selected
+			const currentMetadata = metadata ? JSON.parse(metadata) : {};
+			if (currentMetadata.thread_id === thread_id) {
+				setMessages([]);
+				setMetadata("{}");
+			}
+		} catch (error) {
+			console.error("Failed to delete thread:", error);
+		}
+	};
 
 	return (
 		<div className="flex flex-col w-full h-screen">
@@ -87,15 +104,17 @@ function App() {
 									{threads.map((thread: any, index: number) => (
 										<div
 											key={thread.thread_id || index}
-											className="p-3 rounded-md bg-gray-100 border cursor-pointer"
-											onClick={() => {
-												setMessages(formatMessages(thread.checkpoint.channel_values.messages))
-												setMetadata(JSON.stringify({ thread_id: thread.thread_id}))
-												setCurrentTab("messages");
-											}}
+											className="p-3 rounded-md bg-gray-100 border"
 										>
 											<div className="flex justify-between items-start">
-												<div className="flex-1">
+												<div
+													className="flex-1 cursor-pointer"
+													onClick={() => {
+														setMessages(formatMessages(thread.checkpoint.channel_values.messages))
+														setMetadata(JSON.stringify({ thread_id: thread.thread_id }))
+														setCurrentTab("messages");
+													}}
+												>
 													<h4 className="text-sm font-medium">
 														{thread.thread_id}
 													</h4>
@@ -105,6 +124,17 @@ function App() {
 														</p>
 													)}
 												</div>
+												<Button
+													onClick={(e) => {
+														e.stopPropagation();
+														handleDeleteThread(thread.thread_id);
+													}}
+													size="sm"
+													variant="destructive"
+													className="ml-2"
+												>
+													Delete
+												</Button>
 											</div>
 											{thread.checkpoint.channel_values.messages.length > 0 && (
 												<div className="mt-2">

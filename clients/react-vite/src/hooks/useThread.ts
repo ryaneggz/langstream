@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import apiClient from '@/lib/api';
 
+export type ThreadAction = 'list_threads' | 'list_checkpoints' | 'get_checkpoint' | 'delete_thread';
+
 export type ThreadContextType = {
 	threads: any[];
 	setThreads: (threads: any[]) => void;
@@ -9,7 +11,7 @@ export type ThreadContextType = {
 	setCheckpoints: (checkpoints: any[]) => void;
 	checkpoint: any;
 	setCheckpoint: (checkpoint: any) => void;
-	searchThreads: (action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint', metadata: {thread_id?: string, checkpoint_id?: string}) => void;
+	searchThreads: (action: ThreadAction, metadata: {thread_id?: string, checkpoint_id?: string}) => void;
 	useListThreadsEffect: (trigger?: boolean) => void;
 };
 
@@ -19,7 +21,7 @@ export default function useThread(): ThreadContextType {
 	const [checkpoint, setCheckpoint] = useState<any>(null);
 
 	const searchThreads = async (
-		action: 'list_threads' | 'list_checkpoints' | 'get_checkpoint',
+		action: ThreadAction,
 		metadata: {thread_id?: string, checkpoint_id?: string} = {}
 	) => {
 		const data = await apiClient.searchThreads(action, metadata);
@@ -30,6 +32,10 @@ export default function useThread(): ThreadContextType {
 			setCheckpoints(data);
 		} else if (action === 'get_checkpoint') {
 			setCheckpoint(data);
+		} else if (action === 'delete_thread') {
+			setThreads([]);
+			setCheckpoints([]);
+			setCheckpoint(null);
 		}
 	};
 
