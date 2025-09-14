@@ -53,10 +53,10 @@ function App() {
 	};
 
 	return (
-		<div className="flex flex-col w-full h-screen">
-			<div className="flex-1 flex flex-col">
-				<Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col">
-					<div className="p-4 pb-0">
+		<div className="flex flex-col w-full h-full overflow-hidden">
+			<div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+				<Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+					<div className="p-4 pb-0 flex-shrink-0">
 						<TabsList>
 							<TabsTrigger className="cursor-pointer" value="messages">Messages</TabsTrigger>
 							<TabsTrigger className="cursor-pointer" value="threads">Threads <span className="text-gray-500">{threads.length}</span></TabsTrigger>
@@ -66,7 +66,7 @@ function App() {
 					</div>
 					<TabsContent
 						value="messages"
-						className="flex-1 p-4 pt-0 flex flex-col overflow-hidden max-h-[calc(100vh-150px)]"
+						className="flex-1 p-4 pt-0 flex flex-col min-h-0 overflow-hidden"
 					>
 						<ScrollArea className="flex-1 whitespace-pre-wrap h-0">
 							{messages.length > 0 ? (
@@ -96,9 +96,9 @@ function App() {
 					</TabsContent>
 					<TabsContent
 						value="threads"
-						className="flex-1 overflow-y-auto p-4 pt-0"
+						className="flex-1 p-4 pt-0 flex flex-col min-h-0 overflow-hidden"
 					>
-						<div className="pt-4">
+						<ScrollArea className="flex-1 pt-4">
 							{threads.length > 0 ? (
 								<div className="space-y-2">
 									{threads.map((thread: any, index: number) => (
@@ -154,43 +154,45 @@ function App() {
 									</p>
 								</div>
 							)}
-						</div>
+						</ScrollArea>
 					</TabsContent>
 					<TabsContent
 						value="tools"
-						className="flex-1 overflow-y-auto p-4 pt-0"
+						className="flex-1 p-4 pt-0 flex flex-col min-h-0 overflow-hidden"
 					>
-						<div className="pt-4">
+						<ScrollArea className="flex-1 pt-4">
 							<div className="text-center text-muted-foreground">
 								<p>Tools feature coming soon...</p>
 								<p className="text-sm mt-2">
-										This will show available tools and their
-										descriptions.
+									This will show available tools and their
+									descriptions.
 								</p>
 							</div>
-						</div>
+						</ScrollArea>
 					</TabsContent>
 					<TabsContent
 						value="settings"
-						className="flex-1 overflow-y-auto p-4 pt-0"
+						className="flex-1 p-4 pt-0 flex flex-col min-h-0 overflow-hidden"
 					>
-						<div className="pt-4 space-y-4">
-							<div>
-								<label className="text-sm font-medium mb-2 block">
-									Metadata (JSON)
-								</label>
-								<Textarea
-									placeholder='{"key": "value"}'
-									className="min-h-32 font-mono text-sm"
-									value={metadata}
-									onChange={(e) => setMetadata(e.target.value)}
-								/>
+						<ScrollArea className="flex-1 pt-4">
+							<div className="space-y-4">
+								<div>
+									<label className="text-sm font-medium mb-2 block">
+										Metadata (JSON)
+									</label>
+									<Textarea
+										placeholder='{"key": "value"}'
+										className="min-h-32 font-mono text-sm"
+										value={metadata}
+										onChange={(e) => setMetadata(e.target.value)}
+									/>
+								</div>
 							</div>
-						</div>
+						</ScrollArea>
 					</TabsContent>
 				</Tabs>
 			</div>
-			<div className="p-4 border-t space-y-2">
+			<div className="p-4 border-t space-y-2 flex-shrink-0">
 				<Textarea
 					placeholder="Enter your query..."
 					className="w-full resize-none"

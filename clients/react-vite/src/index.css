@@ -203,7 +203,10 @@ button:focus-visible {
   * {
     @apply border-border outline-ring/50;
   }
+  html, body, #root {
+    @apply h-full overflow-hidden;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground m-0;
   }
 }

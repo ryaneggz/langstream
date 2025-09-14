@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { API_URL } from "@/lib/api";
 import { SSE } from "sse.js";
 
 type StreamMode = "messages" | "values" | "updates" | "debug" | "tasks";
@@ -67,7 +68,7 @@ export default function useChat(): ChatContextType {
 					})),
 			}),
 		};
-		const source = new SSE("http://localhost:8000/llm/stream", options);
+		const source = new SSE(`${API_URL}/llm/stream`, options);
 		source.addEventListener("message", function (e: any) {
 			// Assuming we receive JSON-encoded data payloads:
 			const payload = JSON.parse(e.data);
